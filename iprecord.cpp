@@ -140,7 +140,6 @@ void IPrecord::setIPrecord(const QString &ip_rec)
         }
     }
     else
-
     {
         throw InvalidIPrecord;
     }
@@ -152,6 +151,24 @@ IPrecord IPrecord::operator & (const IPrecord &obj)
              this->twoOctet() & obj.twoOctet(),
              this->threeOctet() & obj.threeOctet(),
              this->fourOctet() & obj.fourOctet());
+}
+
+
+IPrecord IPrecord::operator - (const IPrecord &obj)
+{
+    return IPrecord(this->oneOctet() - obj.oneOctet(),
+                    this->twoOctet() - obj.twoOctet(),
+                    this->threeOctet() - obj.threeOctet(),
+                    this->fourOctet() - obj.fourOctet());
+}
+
+
+IPrecord IPrecord::operator + (const IPrecord &obj)
+{
+    return IPrecord(this->oneOctet() + obj.oneOctet(),
+                    this->twoOctet() + obj.twoOctet(),
+                    this->threeOctet() + obj.threeOctet(),
+                    this->fourOctet() + obj.fourOctet());
 }
 
 

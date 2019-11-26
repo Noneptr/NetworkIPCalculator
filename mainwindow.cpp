@@ -49,12 +49,23 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->expandAll();
     ui->treeView->resizeColumnToContents(0);
 
-    IPrecord ip_rec(109, 128, 1, 1);
-    qDebug() << ip_rec.toQString() << endl;
-    IPrecord ip_rec2("192.168.234.1");
-    qDebug() << ip_rec2.toQString() << endl;
-    IPrecord res = IPrecord("131.107.232.89") & IPrecord("255.255.240.0");
-    qDebug() << res.toQString() << endl;
+    NetMask mask(IPrecord(255, 255, 248, 0));
+    IPrecord ip(95, 189, 76, 115);
+    IPrecord wildcard = IPrecord(255, 255, 255, 255) - mask.mask();
+    IPrecord network = ip & mask.mask();
+    IPrecord direct_broadcast = network + wildcard;
+    IPrecord host_min = network + IPrecord(0, 0, 0, 1);
+    IPrecord host_max = direct_broadcast - IPrecord(0, 0, 0, 1);
+
+    qDebug() << "Adress: " << ip.toQString();                       // ip - адрес
+    qDebug() << "Bitmask: " << mask.countBits();                    // количество бит в маске
+    qDebug() << "Netmask: " << mask.mask().toQString();             // маска подсети
+    qDebug() << "Wildcard: " << wildcard.toQString();               // обратная маска подсети
+    qDebug() << "Network: " << network.toQString();                 // адрес сети
+    qDebug() << "Broadcast: " << direct_broadcast.toQString();      // широковещательный адрес сети
+    qDebug() << "Hostmin: " << host_min.toQString();                // адрес первого хоста
+    qDebug() << "Hostmax: " << host_max.toQString();                // адрес последнего хоста
+    qDebug() << "Hosts: " << mask.countHosts();                     // количество хостов
 }
 
 MainWindow::~MainWindow()

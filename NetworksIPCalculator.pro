@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     iprecord.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    netmask.cpp
 
 HEADERS += \
     iprecord.h \
-    mainwindow.h
+    mainwindow.h \
+    netmask.h
 
 FORMS += \
     mainwindow.ui

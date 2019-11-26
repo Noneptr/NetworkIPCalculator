@@ -31,6 +31,8 @@ public:
     void setIPrecord(const QString &ip_rec);
 
     IPrecord operator & (const IPrecord &obj);
+    IPrecord operator - (const IPrecord &obj);
+    IPrecord operator + (const IPrecord &obj);
 
     QString toQString() const;
 };
