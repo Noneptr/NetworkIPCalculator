@@ -48,6 +48,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->collapseAll();
     ui->treeView->expandAll();
     ui->treeView->resizeColumnToContents(0);
+
+    IPrecord ip_rec(109, 128, 1, 1);
+    qDebug() << ip_rec.toQString() << endl;
+    IPrecord ip_rec2("192.168.234.1");
+    qDebug() << ip_rec2.toQString() << endl;
+    IPrecord res = IPrecord("131.107.232.89") & IPrecord("255.255.240.0");
+    qDebug() << res.toQString() << endl;
 }
 
 MainWindow::~MainWindow()

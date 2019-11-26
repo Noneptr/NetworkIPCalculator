@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QDebug>
+#include "iprecord.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
