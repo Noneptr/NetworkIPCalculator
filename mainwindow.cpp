@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << text << endl;
     ui->treeView->collapseAll();
     ui->treeView->expandAll();
+    ui->treeView->resizeColumnToContents(0);
 }
 
 MainWindow::~MainWindow()
