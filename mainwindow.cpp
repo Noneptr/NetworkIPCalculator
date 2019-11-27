@@ -49,31 +49,33 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->expandAll();
     ui->treeView->resizeColumnToContents(0);
 
-    NetMask mask(IPrecord(255, 192, 0, 0));
-    IPrecord ip(95, 189, 76, 115);
-    IPrecord wildcard = IPrecord(255, 255, 255, 255) - mask.mask();
-    IPrecord network = ip & mask.mask();
-    IPrecord direct_broadcast = network + wildcard;
-    IPrecord host_min = network + 1;
-    IPrecord host_max = direct_broadcast - 1;
+//    NetMask mask(IPrecord(255, 255, 255, 0));
+//    IPrecord ip(192, 168, 0, 0);
+//    IPrecord wildcard = IPrecord(255, 255, 255, 255) - mask.mask();
+//    IPrecord network = ip & mask.mask();
+//    IPrecord direct_broadcast = network + wildcard;
+//    IPrecord host_min = network + 1;
+//    IPrecord host_max = direct_broadcast - 1;
 
-    qDebug() << "Adress: " << ip.toQString();                       // ip - адрес
-    qDebug() << "Bitmask: " << mask.countBits();                    // количество бит в маске
-    qDebug() << "Netmask: " << mask.mask().toQString();             // маска подсети
-    qDebug() << "Wildcard: " << wildcard.toQString();               // обратная маска подсети
-    qDebug() << "Network: " << network.toQString();                 // адрес сети
-    qDebug() << "Broadcast: " << direct_broadcast.toQString();      // широковещательный адрес сети
-    qDebug() << "Hostmin: " << host_min.toQString();                // адрес первого хоста
-    qDebug() << "Hostmax: " << host_max.toQString();                // адрес последнего хоста
-    qDebug() << "Hosts: " << mask.countHosts();                     // количество хостов
+//    qDebug() << "Adress: " << ip.toQString();                       // ip - адрес
+//    qDebug() << "Bitmask: " << mask.countBits();                    // количество бит в маске
+//    qDebug() << "Netmask: " << mask.mask().toQString();             // маска подсети
+//    qDebug() << "Wildcard: " << wildcard.toQString();               // обратная маска подсети
+//    qDebug() << "Network: " << network.toQString();                 // адрес сети
+//    qDebug() << "Broadcast: " << direct_broadcast.toQString();      // широковещательный адрес сети
+//    qDebug() << "Hostmin: " << host_min.toQString();                // адрес первого хоста
+//    qDebug() << "Hostmax: " << host_max.toQString();                // адрес последнего хоста
+//    qDebug() << "Hosts: " << mask.countHosts();                     // количество хостов
 
-//    IPrecord ip1 = ip;
+//    qDebug() << endl;
+
+//    IPrecord ip1 = network;
 //    NetMask mask1(mask.countBits() + 1);
 //    IPrecord wildcard1 = IPrecord(255, 255, 255, 255) - mask1.mask();
-//    IPrecord network1 = ip & mask1.mask();
+//    IPrecord network1 = ip1 & mask1.mask();
 //    IPrecord direct_broadcast1 = network1 + wildcard1;
-//    IPrecord host_min1 = network1 + IPrecord(0, 0, 0, 1);
-//    IPrecord host_max1 = direct_broadcast1 - IPrecord(0, 0, 0, 1);
+//    IPrecord host_min1 = network1 + 1;
+//    IPrecord host_max1 = direct_broadcast1 - 1;
 
 //    qDebug() << "Adress1: " << ip1.toQString();                       // ip - адрес
 //    qDebug() << "Bitmask1: " << mask1.countBits();                    // количество бит в маске
@@ -85,23 +87,27 @@ MainWindow::MainWindow(QWidget *parent)
 //    qDebug() << "Hostmax1: " << host_max1.toQString();                // адрес последнего хоста
 //    qDebug() << "Hosts1: " << mask1.countHosts();                     // количество хостов
 
-//    IPrecord ip2 = network1 + ;
-//    NetMask mask1(mask.countBits() + 1);
-//    IPrecord wildcard1 = IPrecord(255, 255, 255, 255) - mask1.mask();
-//    IPrecord network1 = ip & mask1.mask();
-//    IPrecord direct_broadcast1 = network1 + wildcard1;
-//    IPrecord host_min1 = network1 + IPrecord(0, 0, 0, 1);
-//    IPrecord host_max1 = direct_broadcast1 - IPrecord(0, 0, 0, 1);
+//    qDebug() << endl;
 
-//    qDebug() << "Adress2: " << ip.toQString();                       // ip - адрес
-//    qDebug() << "Bitmask2: " << mask.countBits();                    // количество бит в маске
-//    qDebug() << "Netmask2: " << mask.mask().toQString();             // маска подсети
-//    qDebug() << "Wildcard2: " << wildcard.toQString();               // обратная маска подсети
-//    qDebug() << "Network2: " << network.toQString();                 // адрес сети
-//    qDebug() << "Broadcast2: " << direct_broadcast.toQString();      // широковещательный адрес сети
-//    qDebug() << "Hostmin2: " << host_min.toQString();                // адрес первого хоста
-//    qDebug() << "Hostmax2: " << host_max.toQString();                // адрес последнего хоста
-//    qDebug() << "Hosts2: " << mask.countHosts();                     // количество хостов
+//    IPrecord ip2 = direct_broadcast1 + 1;
+//    NetMask mask2(mask.countBits() + 1);
+//    IPrecord wildcard2 = IPrecord(255, 255, 255, 255) - mask2.mask();
+//    IPrecord network2 = ip2 & mask2.mask();
+//    IPrecord direct_broadcast2 = network2 + wildcard2;
+//    IPrecord host_min2 = network2 + 1;
+//    IPrecord host_max2 = direct_broadcast2 - 1;
+
+//    qDebug() << "Adress2: " << ip2.toQString();                       // ip - адрес
+//    qDebug() << "Bitmask2: " << mask2.countBits();                    // количество бит в маске
+//    qDebug() << "Netmask2: " << mask2.mask().toQString();             // маска подсети
+//    qDebug() << "Wildcard2: " << wildcard2.toQString();               // обратная маска подсети
+//    qDebug() << "Network2: " << network2.toQString();                 // адрес сети
+//    qDebug() << "Broadcast2: " << direct_broadcast2.toQString();      // широковещательный адрес сети
+//    qDebug() << "Hostmin2: " << host_min2.toQString();                // адрес первого хоста
+//    qDebug() << "Hostmax2: " << host_max2.toQString();                // адрес последнего хоста
+//    qDebug() << "Hosts2: " << mask2.countHosts();                     // количество хостов
+
+//    qDebug() << endl;
 }
 
 MainWindow::~MainWindow()
