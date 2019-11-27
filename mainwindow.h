@@ -6,6 +6,7 @@
 #include <QDebug>
 #include "iprecord.h"
 #include "netmask.h"
+#include <QAbstractItemView>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

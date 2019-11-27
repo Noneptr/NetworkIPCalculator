@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
         }
         parentItem->appendRow(pitemi);
     }
+
+    parentItem->data(Qt::DisplayRole);
 //    for (int i =0; i < 4; i++)
 //    {
 //        QStandardItem *item = new QStandardItem(QString("item %0").arg(i));
@@ -48,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->collapseAll();
     ui->treeView->expandAll();
     ui->treeView->resizeColumnToContents(0);
+    ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование дерева
 
 //    NetMask mask(IPrecord(255, 255, 255, 0));
 //    IPrecord ip(192, 168, 0, 0);
