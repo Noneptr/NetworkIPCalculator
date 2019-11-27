@@ -10,31 +10,43 @@ enum IPrecordError {InvalidOneOctetError, InvalidTwoOctetError,
 class IPrecord
 {
 private:
-    unsigned short __one_oct;
-    unsigned short __two_oct;
-    unsigned short __three_oct;
-    unsigned short __four_oct;
+    unsigned short __one_oct = 0;
+    unsigned short __two_oct = 0;
+    unsigned short __three_oct = 0;
+    unsigned short __four_oct = 0;
+
+    static bool isValidQStringForIP(const QString &ip_rec);             // проверка на правильность сотавления QString строки с ip
 public:
-    IPrecord(unsigned short one = 255, unsigned short two = 255, unsigned short three = 255 , unsigned short four = 255);
+    IPrecord() = default;
+    IPrecord(unsigned short one, unsigned short two, unsigned short three, unsigned short four);
     IPrecord(const QString &ip_rec);
 
+    // =============== методы получения значений октетов ip ===========================
     unsigned short oneOctet() const;
     unsigned short twoOctet() const;
     unsigned short threeOctet() const;
     unsigned short fourOctet() const;
+    QString toQString() const;
+    // ======================================================================
 
+    // =============== методы изменения значений октетов ip ===========================
     void setOneOctet(unsigned short one);
     void setTwoOctet(unsigned short two);
     void setThreeOctet(unsigned short three);
     void setFourOctet(unsigned short four);
     void setIPrecord(unsigned short one, unsigned short two, unsigned short three, unsigned short four);
     void setIPrecord(const QString &ip_rec);
+    // ================================================================================
 
-    IPrecord operator & (const IPrecord &obj);
-    IPrecord operator - (const IPrecord &obj);
-    IPrecord operator + (const IPrecord &obj);
+    // ================ операции с ip записями ==========================================
+    IPrecord operator & (const IPrecord &obj) const;
+    IPrecord operator - (const IPrecord &obj) const;
+    IPrecord operator + (const IPrecord &obj) const;
+    IPrecord operator + (unsigned short val) const;
+    IPrecord operator - (unsigned short val) const;
 
-    QString toQString() const;
+    friend IPrecord operator + (unsigned short val, const IPrecord &obj);
+    // ==================================================================================
 };
 
 #endif // IPRECORD_H

@@ -17,8 +17,8 @@
    <widget class="QTreeView" name="treeView">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>120</y>
+      <x>20</x>
+      <y>10</y>
       <width>256</width>
       <height>192</height>
      </rect>
