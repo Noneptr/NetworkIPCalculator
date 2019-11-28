@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     model->setHorizontalHeaderLabels({QString("")});
     for (int i = 0; i < 5; i++)
     {
-        QStandardItem *pitemi = new QStandardItem(QString("item %0").arg(i));
+        QStandardItem *pitemi = new QStandardItem(QString("Address: 192.168.0.%0").arg(i));
         for (int j = 0; j < 3; j++)
         {
             QStandardItem *pitemj = new QStandardItem(QString("item %0 %1").arg(i).arg(j));
@@ -72,6 +72,20 @@ MainWindow::MainWindow(QWidget *parent)
 
 //    qDebug() << endl;
 
+//    NetworkInfo ni(ip, mask);
+
+//    qDebug() << "Adress: " << ip.toQString();                       // ip - адрес
+//    qDebug() << "Bitmask: " << ni.mask().countBits();                    // количество бит в маске
+//    qDebug() << "Netmask: " << ni.mask().mask().toQString();             // маска подсети
+//    qDebug() << "Wildcard: " << ni.wildcard().toQString();               // обратная маска подсети
+//    qDebug() << "Network: " << ni.network().toQString();                 // адрес сети
+//    qDebug() << "Broadcast: " << ni.directBroadcast().toQString();      // широковещательный адрес сети
+//    qDebug() << "Hostmin: " << ni.hostMin().toQString();                // адрес первого хоста
+//    qDebug() << "Hostmax: " << ni.hostMax().toQString();                // адрес последнего хоста
+//    qDebug() << "Hosts: " << ni.mask().countHosts();                     // количество хостов
+
+//    qDebug() << endl;
+
 //    IPrecord ip1 = network;
 //    NetMask mask1(mask.countBits() + 1);
 //    IPrecord wildcard1 = IPrecord(255, 255, 255, 255) - mask1.mask();
@@ -111,6 +125,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    qDebug() << "Hosts2: " << mask2.countHosts();                     // количество хостов
 
 //    qDebug() << endl;
+
 }
 
 MainWindow::~MainWindow()

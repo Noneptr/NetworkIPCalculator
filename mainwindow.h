@@ -7,6 +7,7 @@
 #include "iprecord.h"
 #include "netmask.h"
 #include <QAbstractItemView>
+#include "networkinfo.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
