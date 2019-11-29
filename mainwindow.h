@@ -8,6 +8,7 @@
 #include "netmask.h"
 #include <QAbstractItemView>
 #include "networkinfo.h"
+#include "networktreemodel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,6 +24,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QStandardItemModel * model;
+    NetworkTreeModel * model;
 };
 #endif // MAINWINDOW_H
