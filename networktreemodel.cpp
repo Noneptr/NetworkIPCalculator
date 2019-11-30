@@ -2,11 +2,18 @@
 
 QVector<QString> NetworkTreeModel::__signs__ = {"Adress: ", "BitMask: ", "Mask: ",
                                                 "Wildcard: ", "Direct broadcast: ",
-                                                "Host min: ", "Host max: ", "Hosts: "};
+                                                "Host min: ", "Host max: ", "Hosts: ", "Busy hosts: "};
+
+QString NetworkTreeModel::__emptySign__ = "&";
 
 
 NetworkTreeModel::NetworkTreeModel(QObject *parent)
-    :QStandardItemModel(parent)
+    :QStandardItemModel(parent), __filename("new_net_tree")
+{
+}
+
+NetworkTreeModel::NetworkTreeModel(const QString &filename, QObject *parent)
+    :QStandardItemModel(parent), __filename(filename)
 {
 }
 
@@ -27,7 +34,7 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
     NetMask subMask = NetMask(net_info.mask().countBits() + 1);
     if (subMask.countHosts() >= 2)
     {
-        node->appendRow(new QStandardItem("&"));
+        node->appendRow(new QStandardItem(__emptySign__));
     }
 
     parent->appendRow(node);
@@ -70,8 +77,29 @@ void NetworkTreeModel::mergeNetworkItem(const QModelIndex &parentIndex)
     if (netItem->rowCount() == 2)
     {
         netItem->removeRows(0, netItem->rowCount());
-        netItem->appendRow(new QStandardItem("&"));
+        netItem->appendRow(new QStandardItem(__emptySign__));
     }
+}
+
+
+void NetworkTreeModel::setFilename(const QString &filename)
+{
+    __filename = filename;
+}
+
+
+QString NetworkTreeModel::filename() const
+{
+    return __filename;
+}
+
+void NetworkTreeModel::writeNetworkInFile()
+{
+}
+
+
+void NetworkTreeModel::readNetworkOfFile()
+{
 }
 
 
