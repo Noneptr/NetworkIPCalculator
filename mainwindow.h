@@ -22,6 +22,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void alignColumnsInTreeView();
+
 private:
     Ui::MainWindow *ui;
     NetworkTreeModel * model;

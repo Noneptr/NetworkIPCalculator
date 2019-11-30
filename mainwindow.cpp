@@ -9,8 +9,9 @@ MainWindow::MainWindow(QWidget *parent)
     model = new NetworkTreeModel(this);
 
     connect(ui->treeView, SIGNAL(expanded(const QModelIndex &)), model, SLOT(splitNetworkItem(const QModelIndex &)));
+    connect(ui->treeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(alignColumnsInTreeView()));
     model->setHorizontalHeaderLabels({QString("")});
-    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(29));
+    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
 //    model = new QStandardItemModel(this);
 //    QStandardItem * parentItem = model->invisibleRootItem();
 //    model->setHorizontalHeaderLabels({QString("")});
@@ -47,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    }
     ui->treeView->setModel(model);
 //    ui->treeView->collapseAll();
+    ui->treeView->setIndentation(100);
 //    ui->treeView->expandAll();
     ui->treeView->resizeColumnToContents(0);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование дерева
@@ -125,6 +127,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 //    qDebug() << endl;
 
+}
+
+
+void MainWindow::alignColumnsInTreeView()
+{
+    ui->treeView->resizeColumnToContents(0);
 }
 
 MainWindow::~MainWindow()

@@ -20,7 +20,7 @@ public:
 public slots:
     void createNetworkItem(QStandardItem *parent, const NetworkInfo &net_info);         // создать узел
     void createNetworkRoot(const IPrecord &ip, const NetMask &mask);                    // создать корневой узел сеть
-    void splitNetworkItem(const QModelIndex &index);                                    // разделить сеть на подсети
+    void splitNetworkItem(const QModelIndex &parentIndex);                                    // разделить сеть на подсети
 //    void mergeNetworkItem(const QModelIndex &index);                                    // объединить подсети в сеть
 };
 
