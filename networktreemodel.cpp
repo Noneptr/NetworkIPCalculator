@@ -60,32 +60,18 @@ void NetworkTreeModel::splitNetworkItem(const QModelIndex &parentIndex)
             netItem->removeRow(0);
         }
     }
-//    if (parentItem)
-//    {
-//        if (parentItem->rowCount() > 0)
-//        {
-//            QStandardItem *netItem = parentItem->child(parentIndex.row());
-//            if (netItem)
-//            {
-//                if (netItem->rowCount() == 1)
-//                {
-//                    QString data = netItem->text();
-//                    if (data != "")
-//                    {
-//                        QStringList list = data.split("\n");
-//                        IPrecord net_ip(list[0].split(" ")[1]);                                     // выделить из данных адрес сети
-//                        NetMask net_mask(list[2].split(" ")[1]);                                    // выделить из данных маску сети
-//                        NetworkInfo sub_net1(net_ip, NetMask(net_mask.countBits() + 1));
-//                        NetworkInfo sub_net2(sub_net1.directBroadcast() + 1, NetMask(net_mask.countBits() + 1));
+}
 
-//                        createNetworkItem(netItem, sub_net1);
-//                        createNetworkItem(netItem, sub_net2);
-//                        netItem->removeRow(0);
-//                    }
-//                }
-//            }
-//        }
-//    }
+
+void NetworkTreeModel::mergeNetworkItem(const QModelIndex &parentIndex)
+{
+    QStandardItem *parentItem = static_cast<QStandardItem *>(parentIndex.internalPointer());
+    QStandardItem *netItem = parentItem->child(parentIndex.row());
+    if (netItem->rowCount() == 2)
+    {
+        netItem->removeRows(0, netItem->rowCount());
+        netItem->appendRow(new QStandardItem("&"));
+    }
 }
 
 

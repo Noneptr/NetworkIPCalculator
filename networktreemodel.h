@@ -18,10 +18,10 @@ public:
     virtual ~NetworkTreeModel();
 
 public slots:
-    void createNetworkItem(QStandardItem *parent, const NetworkInfo &net_info);         // создать узел
-    void createNetworkRoot(const IPrecord &ip, const NetMask &mask);                    // создать корневой узел сеть
+    void createNetworkItem(QStandardItem *parent, const NetworkInfo &net_info);               // создать узел
+    void createNetworkRoot(const IPrecord &ip, const NetMask &mask);                          // создать корневой узел сеть
     void splitNetworkItem(const QModelIndex &parentIndex);                                    // разделить сеть на подсети
-//    void mergeNetworkItem(const QModelIndex &index);                                    // объединить подсети в сеть
+    void mergeNetworkItem(const QModelIndex &parentIndex);                                    // объединить подсети в сеть
 };
 
 #endif // NETWORKTREEMODEL_H
