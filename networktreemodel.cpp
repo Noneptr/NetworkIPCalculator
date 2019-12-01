@@ -43,9 +43,76 @@ NetworkInfo NetworkTreeModel::stringToNetInfo(const QString &data)
 }
 
 
+void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
+{
+    QStandardItem *parent = invisibleRootItem();
+    if (parent->rowCount() == 0)
+    {
+        createNetworkItem(parent, net_info);
+    }
+    else
+    {
+        QStandardItem *root = parent->child(0);
+        QStandardItem *curr = root;
+        while (true)
+        {
+            NetworkInfo curr_info = stringToNetInfo(curr->text());          // получение сетевых данных о текущем узле
+            IPrecord mid_host = curr_info.directBroadcast() - curr_info.directBroadcast() / 2;
+            if (net_info.directBroadcast() < mid_host)                      // если меньше среднего адреса сети узла
+            {
+                if (curr->rowCount() == 1)
+                {
+                    createNetworkItem(curr, net_info);                      // создаём и присоединяем новый узел
+                    if (curr->text() == __emptySign__)
+                    {
+                        curr->removeRow(0);                                 // удаления пустого символа
+                    }
+                    else                                                    // нарушение структуры т.к. правый узел стоит первым
+                    {
+                        QStandardItem *left = curr->child(1);               // восстановление структуры сыновей, путём перестановки их местами
+                        QStandardItem *right = curr->child(0);
+                        curr->insertRow(0, left);
+                        curr->insertRow(1, right);
+                    }
+                    break;
+                }
+                else if (curr->rowCount() == 2)
+                {
+                    curr = curr->child(0);                                  // спуститься к левому сыну
+                }
+                else
+                {
+                    break;                                                  // достигнут самый нижний уровень дерева, выход из вставки
+                }
+            }
+            else
+            {
+                if (curr->rowCount() == 1)
+                {
+                    createNetworkItem(curr, net_info);                       // создаём и присоединяем новый узел
+                    if (curr->text() == __emptySign__)
+                    {
+                        curr->removeRow(0);                                  // удаление пустого символа
+                    }
+                    break;
+                }
+                else if (curr->rowCount() == 2)
+                {
+                    curr = curr->child(1);                                  // спуститься к правому сыну
+                }
+                else
+                {
+                    break;                                                  // достигнут самый нижний уровень дерева, выход из вставки
+                }
+            }
+        }
+    }
+}
+
+
 void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInfo &net_info)
 {
-    QString data = NetworkTreeModel::netInfoToString(net_info);
+    QString data = netInfoToString(net_info);
 
     QStandardItem *node = new QStandardItem(data);
 
@@ -65,6 +132,13 @@ void NetworkTreeModel::createNetworkRoot(const IPrecord &ip, const NetMask &mask
     createNetworkItem(parentItem, NetworkInfo(ip, mask));
 }
 
+
+void NetworkTreeModel::createNetworkRoot(const NetworkInfo &net_info)
+{
+    QStandardItem *parentItem = this->invisibleRootItem();
+    createNetworkItem(parentItem, net_info);
+}
+
 void NetworkTreeModel::splitNetworkItem(const QModelIndex &parentIndex)
 {
     QStandardItem * parentItem = static_cast<QStandardItem *>(parentIndex.internalPointer());
@@ -74,7 +148,7 @@ void NetworkTreeModel::splitNetworkItem(const QModelIndex &parentIndex)
         QString data = netItem->text();
         if (data != "")
         {
-            NetworkInfo net = NetworkTreeModel::stringToNetInfo(data);
+            NetworkInfo net = stringToNetInfo(data);
             NetworkInfo sub_net1(net.network(), NetMask(net.mask().countBits() + 1));
             NetworkInfo sub_net2(sub_net1.directBroadcast() + 1, NetMask(net.mask().countBits() + 1));
 

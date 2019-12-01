@@ -29,8 +29,10 @@ public:
     QString filename() const;
 
 public slots:
+    void insertIntoNetwork(const NetworkInfo &net_info);
     void createNetworkItem(QStandardItem *parent, const NetworkInfo &net_info);               // создать узел
     void createNetworkRoot(const IPrecord &ip, const NetMask &mask);                          // создать корневой узел сеть
+    void createNetworkRoot(const NetworkInfo &net_info);                                      // создать корневой узел сеть
     void splitNetworkItem(const QModelIndex &parentIndex);                                    // разделить сеть на подсети
     void mergeNetworkItem(const QModelIndex &parentIndex);                                    // объединить подсети в сеть
     void writeNetworkInFile();
