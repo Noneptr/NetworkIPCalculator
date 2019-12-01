@@ -13,13 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(model, SIGNAL(needExpandItem(const QModelIndex &)), ui->treeView, SLOT(expand(const QModelIndex &)));
 
     model->setHorizontalHeaderLabels({QString("")});
-//    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
-    model->insertIntoNetwork(NetworkInfo(IPrecord(192, 168, 0, 0), NetMask(24)));
-    model->insertIntoNetwork(NetworkInfo(IPrecord(192, 168, 0, 128), NetMask(25)));
-    model->insertIntoNetwork(NetworkInfo(IPrecord(192, 168, 0, 128), NetMask(26)));
-    model->insertIntoNetwork(NetworkInfo(IPrecord(192, 168, 0, 192), NetMask(26)));
-    model->insertIntoNetwork(NetworkInfo(IPrecord(192, 168, 0, 0), NetMask(25)));
-    model->setFilename("my_net");
+    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
 
     ui->treeView->setModel(model);
     ui->treeView->setIndentation(75);
@@ -75,12 +69,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    model->expandAllExist();
-//    model->writeNetworkInFile();
+    model->writeNetworkInFile();
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    model->expandAllExist();
-//    model->readNetworkOfFile();
+    model->readNetworkOfFile();
 }

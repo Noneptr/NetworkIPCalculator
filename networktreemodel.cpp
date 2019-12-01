@@ -62,18 +62,16 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
             {
                 if (curr->rowCount() == 1)
                 {
-                    //=============================================================================================
                     QString child0data = curr->child(0)->text();
                     if (child0data != __emptySign__)
                     {
                         NetworkInfo child_info = stringToNetInfo(child0data);
-                        if (child_info.directBroadcast() < mid_host)
+                        if (child_info.directBroadcast() < mid_host)        // если позиция левого занята
                         {
-                            curr = curr->child(0);
+                            curr = curr->child(0);                          // то спускаемся к нему
                             continue;
                         }
                     }
-                    //=============================================================================================
 
                     createNetworkItem(curr, net_info);                      // создаём и присоединяем новый узел
                     if (child0data == __emptySign__)
@@ -99,18 +97,17 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
             {
                 if (curr->rowCount() == 1)
                 {
-                    //=============================================================================================
                     QString child0data = curr->child(0)->text();
                     if (child0data != __emptySign__)
                     {
                         NetworkInfo child_info = stringToNetInfo(child0data);
-                        if (child_info.directBroadcast() >= mid_host)
+                        if (child_info.directBroadcast() >= mid_host)       // если позиция правого занята
                         {
-                            curr = curr->child(0);
+                            curr = curr->child(0);                          // то спускаемся к нему
                             continue;
                         }
                     }
-                    //=============================================================================================
+
                     createNetworkItem(curr, net_info);                       // создаём и присоединяем новый узел
                     if (curr->child(0)->text() == __emptySign__)
                     {
@@ -166,7 +163,7 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
     NetMask subMask = NetMask(net_info.mask().countBits() + 1);
     if (subMask.countHosts() >= 2)                                                      // проверка на то что может ли существовать следующий узел
     {
-        node->appendRow(new QStandardItem(__emptySign__));
+        node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
     }
 
     parent->appendRow(node);
@@ -188,33 +185,30 @@ void NetworkTreeModel::createNetworkRoot(const NetworkInfo &net_info)
 
 void NetworkTreeModel::splitNetworkItem(const QModelIndex &parentIndex)
 {
-    QStandardItem * parentItem = static_cast<QStandardItem *>(parentIndex.internalPointer());
-    QStandardItem *netItem = parentItem->child(parentIndex.row());
+    QStandardItem * parentItem = static_cast<QStandardItem *>(parentIndex.internalPointer());       // родитель разделяемого узла
+    QStandardItem *netItem = parentItem->child(parentIndex.row());                                  // разделяемый узел
     if (netItem->rowCount() == 1)
     {
         QString data = netItem->text();
-        if (data != "")
-        {
-            NetworkInfo net = stringToNetInfo(data);
-            NetworkInfo sub_net1(net.network(), NetMask(net.mask().countBits() + 1));
-            NetworkInfo sub_net2(sub_net1.directBroadcast() + 1, NetMask(net.mask().countBits() + 1));
+        NetworkInfo net = stringToNetInfo(data);
+        NetworkInfo sub_net1(net.network(), NetMask(net.mask().countBits() + 1));                   // выделение подсетей
+        NetworkInfo sub_net2(sub_net1.directBroadcast() + 1, NetMask(net.mask().countBits() + 1));
 
-            createNetworkItem(netItem, sub_net1);
-            createNetworkItem(netItem, sub_net2);
-            netItem->removeRow(0);
-        }
+        createNetworkItem(netItem, sub_net1);                                                       // добавление подсетей в дерево
+        createNetworkItem(netItem, sub_net2);
+        netItem->removeRow(0);                                                                      // удаление пустого символа __emptySign__
     }
 }
 
 
 void NetworkTreeModel::mergeNetworkItem(const QModelIndex &parentIndex)
 {
-    QStandardItem *parentItem = static_cast<QStandardItem *>(parentIndex.internalPointer());
-    QStandardItem *netItem = parentItem->child(parentIndex.row());
+    QStandardItem *parentItem = static_cast<QStandardItem *>(parentIndex.internalPointer());        // родитель агрегируемого узла
+    QStandardItem *netItem = parentItem->child(parentIndex.row());                                  // агрегируемый узел
     if (netItem->rowCount() == 2)
     {
-        netItem->removeRows(0, netItem->rowCount());
-        netItem->appendRow(new QStandardItem(__emptySign__));
+        netItem->removeRows(0, netItem->rowCount());                                                // удаление дочерних узлов
+        netItem->appendRow(new QStandardItem(__emptySign__));                                       // добавление пустого символа
     }
 }
 
@@ -243,23 +237,21 @@ void NetworkTreeModel::writeNetworkInFile()
             std::queue<QStandardItem *> nodes;
             nodes.push(root);
             QStandardItem *curr;
-            while(!nodes.empty())                                           // обход дерева в ширину
+            while(!nodes.empty())                                                // обход дерева в ширину
             {
                 curr = nodes.front();
                 nodes.pop();
 
-                if (curr->text() == "&")
+                if (curr->text() != __emptySign__)
                 {
-                    continue;
-                }
+                    NetworkInfo net_info = stringToNetInfo(curr->text());
 
-                NetworkInfo net_info = stringToNetInfo(curr->text());
+                    fwrite(&net_info, sizeof(net_info), 1, file);               // запись информации об узле в файл
 
-                fwrite(&net_info, sizeof(net_info), 1, file);
-
-                for (int i = 0; i < curr->rowCount(); i++)
-                {
-                    nodes.push(curr->child(i));
+                    for (int i = 0; i < curr->rowCount(); i++)
+                    {
+                        nodes.push(curr->child(i));
+                    }
                 }
             }
         }
@@ -282,15 +274,16 @@ void NetworkTreeModel::readNetworkOfFile()
         setHorizontalHeaderLabels({QString("")});
 
         NetworkInfo net_info;
-        while (fread(&net_info, sizeof(net_info), 1, file) == 1)
+        while (fread(&net_info, sizeof(net_info), 1, file) == 1)        // чтение информации об узле из файла
         {
-            insertIntoNetwork(net_info);
+            insertIntoNetwork(net_info);                                // вставка узла в дерево
         }
 
         fclose(file);
 
-        // чтение быстрее чем расширение
-        expandAllExist();
+        // раскрытие довольно дорогая операция
+        // чтение происходит быстрее
+        expandAllExist();                                               // раскрытие всех существующих узлов
     }
     else
     {

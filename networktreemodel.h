@@ -6,23 +6,41 @@
 #include <queue>
 #include <QDebug>
 
+/* Класс представляет
+ * собой древовидную структуру данных
+ * для работы с сетевой моделью
+ *            net
+ *          /     \
+    subnet1        subnet2 */
+
 
 enum NetworkTreeModelError {__ERROR_WRITE_IN_BIN_FILE__, __ERROR_READ_OF_BIN_FILE__};       // Исключения вызываемые классом
 
-const QString __file_extention__ = ".ipcalc";
+const QString __file_extention__ = ".ipcalc";                                               // расширение бинарного файла с сетевой схемой
 
 class NetworkTreeModel: public QStandardItemModel
 {
     Q_OBJECT
 
 private:
-    QString __filename;
+    QString __filename;                                                                     // имя файла
 
 public:
-    static QVector<QString> __signs__;                                                  // подписи при выводе
+    static QVector<QString> __signs__;
+    /* Хранит в себе список подписей для элементов NetworkInfo.
+       Необходимо для понятного вывода, а соответственно преобразования
+       NetworkInfo в QString и обратно*/
+
     static QString __emptySign__;
+    /* Хранит в себе пустой символ.
+       Он необходим для того чтобы представление чётко понимало,
+       что имеющие его элементы должны иметь возможность разделения,
+       а не имеющие нет*/
+
+    // ================ функции преобразования NetworkInfo в QString и обратно ======================
     static QString netInfoToString(const NetworkInfo &net_info);
     static NetworkInfo stringToNetInfo(const QString &data);
+    //===============================================================================================
 
 public:
     NetworkTreeModel(QObject *parent = nullptr);
@@ -34,15 +52,24 @@ public:
     QString filename() const;
 
 public slots:
+    // ============================= Создание и вставка узла ===============================================================
     void insertIntoNetwork(const NetworkInfo &net_info);
     void createNetworkItem(QStandardItem *parent, const NetworkInfo &net_info);               // создать узел
     void createNetworkRoot(const IPrecord &ip, const NetMask &mask);                          // создать корневой узел сеть
     void createNetworkRoot(const NetworkInfo &net_info);                                      // создать корневой узел сеть
+    //======================================================================================================================
+
+    //============================= Разделение и слияние сети =============================================================
     void splitNetworkItem(const QModelIndex &parentIndex);                                    // разделить сеть на подсети
     void mergeNetworkItem(const QModelIndex &parentIndex);                                    // объединить подсети в сеть
+    //=====================================================================================================================
+
     void expandAllExist();                                                                    // раскрыть все cуществующие p.s. довольно тяжёлая операция
+
+    //============ Работа с файлом =========================================================================================
     void writeNetworkInFile();                                                                // записать модель в файл
     void readNetworkOfFile();                                                                 // считать модель из файла
+    //======================================================================================================================
 
 signals:
     void needExpandItem(const QModelIndex&);                                                  // сигнализирует представлению о необходимости
