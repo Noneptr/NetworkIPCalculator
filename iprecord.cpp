@@ -247,6 +247,52 @@ IPrecord IPrecord::operator - (unsigned short val) const
 }
 
 
+bool IPrecord::operator == (const IPrecord &obj) const
+{
+    return  __one_oct == obj.__one_oct &&
+            __two_oct == obj.__two_oct &&
+            __three_oct == obj.__three_oct &&
+            __four_oct == obj.__four_oct;
+}
+
+
+bool IPrecord::operator < (const IPrecord &obj) const
+{
+    return this->toUInt() < obj.toUInt();
+}
+
+
+bool IPrecord::operator > (const IPrecord &obj) const
+{
+    return this->toUInt() > obj.toUInt();
+}
+
+
+bool IPrecord::operator <= (const IPrecord &obj) const
+{
+    return *this < obj || *this == obj;
+}
+
+bool IPrecord::operator >= (const IPrecord &obj) const
+{
+    return *this > obj || *this == obj;
+}
+
+
+IPrecord IPrecord::operator / (unsigned short val) const
+{
+    return IPrecord(__one_oct / val, __two_oct / val, __three_oct / val, __four_oct / val);
+}
+
+
+unsigned int IPrecord::toUInt() const
+{
+    return __one_oct * static_cast<unsigned int>(std::pow(256, 3)) +
+           __two_oct * static_cast<unsigned int>(std::pow(256, 2)) +
+           __three_oct * 256 + __four_oct;
+}
+
+
 QString IPrecord::toQString() const
 {
     return QString::number(__one_oct) + "."

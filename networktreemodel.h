@@ -16,6 +16,8 @@ private:
 public:
     static QVector<QString> __signs__;                                                  // подписи при выводе
     static QString __emptySign__;
+    static QString netInfoToString(const NetworkInfo &net_info);
+    static NetworkInfo stringToNetInfo(const QString &data);
 
 public:
     NetworkTreeModel(QObject *parent = nullptr);

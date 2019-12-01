@@ -2,6 +2,7 @@
 #define IPRECORD_H
 
 #include <QString>
+#include <cmath>
 
 enum IPrecordError {InvalidOneOctetError, InvalidTwoOctetError,
                     InvalidThreeOctetError, InvalidFourOctetError, InvalidIPrecord};
@@ -27,6 +28,7 @@ public:
     unsigned short threeOctet() const;
     unsigned short fourOctet() const;
     QString toQString() const;
+    unsigned int toUInt() const;
     // ======================================================================
 
     // =============== методы изменения значений октетов ip ===========================
@@ -42,8 +44,16 @@ public:
     IPrecord operator & (const IPrecord &obj) const;
     IPrecord operator - (const IPrecord &obj) const;
     IPrecord operator + (const IPrecord &obj) const;
+
     IPrecord operator + (unsigned short val) const;
     IPrecord operator - (unsigned short val) const;
+    IPrecord operator / (unsigned short val) const;
+
+    bool operator == (const IPrecord &obj) const;
+    bool operator < (const IPrecord &obj) const;
+    bool operator > (const IPrecord &obj) const;
+    bool operator <= (const IPrecord &obj) const;
+    bool operator >= (const IPrecord &obj) const;
 
     friend IPrecord operator + (unsigned short val, const IPrecord &obj);
     // ==================================================================================

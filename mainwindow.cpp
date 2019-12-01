@@ -13,11 +13,23 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->treeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(alignColumnsInTreeView()));
 
     model->setHorizontalHeaderLabels({QString("")});
-    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
+    model->createNetworkRoot(IPrecord(126, 168, 0, 0), NetMask(16));
     ui->treeView->setModel(model);
     ui->treeView->setIndentation(100);
     ui->treeView->resizeColumnToContents(0);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование дерева
+
+//    IPrecord net_ip(192, 168, 0, 0);
+//    NetMask net_mask(24);
+
+//    NetworkInfo net_info(net_ip, net_mask);
+//    NetworkInfo sub_net1(net_ip, NetMask(net_mask.countBits() + 1));
+//    NetworkInfo sub_net2(sub_net1.directBroadcast() + 1, NetMask(net_mask.countBits() + 1));
+
+//    IPrecord res = net_info.directBroadcast() - net_info.wildcard() / 2;
+//    qDebug() << res.toQString() << endl;
+//    sub_net1.directBroadcast() < res ? qDebug() << 1: qDebug() << 0;
+//    sub_net2.directBroadcast() >= res ? qDebug() << 1: qDebug() << 0;
 }
 
 

@@ -18,7 +18,7 @@ NetworkTreeModel::NetworkTreeModel(const QString &filename, QObject *parent)
 }
 
 
-void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInfo &net_info)
+QString NetworkTreeModel::netInfoToString(const NetworkInfo &net_info)
 {
     QString data = "";
     data += __signs__[0] + net_info.network().toQString() + "\n" +
@@ -29,10 +29,28 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
             __signs__[5] + net_info.hostMin().toQString() + "\n" +
             __signs__[6] + net_info.hostMax().toQString() + "\n" +
             __signs__[7] + QString::number(net_info.mask().countHosts());
+    return data;
+}
+
+
+NetworkInfo NetworkTreeModel::stringToNetInfo(const QString &data)
+{
+    QStringList list = data.split("\n");
+    IPrecord net_ip(list[0].split(" ")[1]);                                     // выделить из данных адрес сети
+    NetMask net_mask(list[2].split(" ")[1]);                                    // выделить из данных маску сети
+    NetworkInfo net_info(net_ip, net_mask);
+    return net_info;
+}
+
+
+void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInfo &net_info)
+{
+    QString data = NetworkTreeModel::netInfoToString(net_info);
+
     QStandardItem *node = new QStandardItem(data);
 
     NetMask subMask = NetMask(net_info.mask().countBits() + 1);
-    if (subMask.countHosts() >= 2)
+    if (subMask.countHosts() >= 2)                                                      // проверка на то что может ли существовать следующий узел
     {
         node->appendRow(new QStandardItem(__emptySign__));
     }
@@ -56,11 +74,9 @@ void NetworkTreeModel::splitNetworkItem(const QModelIndex &parentIndex)
         QString data = netItem->text();
         if (data != "")
         {
-            QStringList list = data.split("\n");
-            IPrecord net_ip(list[0].split(" ")[1]);                                     // выделить из данных адрес сети
-            NetMask net_mask(list[2].split(" ")[1]);                                    // выделить из данных маску сети
-            NetworkInfo sub_net1(net_ip, NetMask(net_mask.countBits() + 1));
-            NetworkInfo sub_net2(sub_net1.directBroadcast() + 1, NetMask(net_mask.countBits() + 1));
+            NetworkInfo net = NetworkTreeModel::stringToNetInfo(data);
+            NetworkInfo sub_net1(net.network(), NetMask(net.mask().countBits() + 1));
+            NetworkInfo sub_net2(sub_net1.directBroadcast() + 1, NetMask(net.mask().countBits() + 1));
 
             createNetworkItem(netItem, sub_net1);
             createNetworkItem(netItem, sub_net2);
@@ -95,6 +111,7 @@ QString NetworkTreeModel::filename() const
 
 void NetworkTreeModel::writeNetworkInFile()
 {
+
 }
 
 
