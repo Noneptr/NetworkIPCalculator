@@ -27,7 +27,14 @@ IPrecord NetMask::mask() const
 
 unsigned int NetMask::countHosts() const
 {
-    return static_cast<unsigned int>(pow(2, 32 - countBits()) - 2);
+    if (countBits() == 32)
+    {
+        return 0;
+    }
+    else
+    {
+        return static_cast<unsigned int>(pow(2, 32 - countBits()) - 2);
+    }
 }
 
 
@@ -65,38 +72,6 @@ void NetMask::setMask(unsigned short count_bits)
             __mask.setThreeOctet(255);
             __mask.setFourOctet(allow_octets[count_bits - 24]);
         }
-//        int size = static_cast<int>(count_bits);
-//        int i = 7;
-//        int j = 0;
-//        int num = 0;
-//        while (size >= 0)
-//        {
-//            if ((i < 0) or (size == 0))
-//            {
-//                i = 7;
-//                if (j == 0)
-//                {
-//                    __mask.setOneOctet(static_cast<unsigned short>(num));
-//                }
-//                else if (j == 1)
-//                {
-//                    __mask.setTwoOctet(static_cast<unsigned short>(num));
-//                }
-//                else if (j == 2)
-//                {
-//                    __mask.setThreeOctet(static_cast<unsigned short>(num));
-//                }
-//                else
-//                {
-//                    __mask.setFourOctet(static_cast<unsigned short>(num));
-//                }
-//                num = 0;
-//                j++;
-//            }
-//            num += static_cast<int>(std::pow(2, i));
-//            i--;
-//            size--;
-//        }
     }
     else
     {

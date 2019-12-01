@@ -3,8 +3,13 @@
 
 #include <QStandardItemModel>
 #include "networkinfo.h"
+#include <queue>
 #include <QDebug>
 
+
+enum NetworkTreeModelError {__ERROR_WRITE_IN_BIN_FILE__, __ERROR_READ_OF_BIN_FILE__};       // Исключения вызываемые классом
+
+const QString __file_extention__ = ".ipcalc";
 
 class NetworkTreeModel: public QStandardItemModel
 {
@@ -35,8 +40,13 @@ public slots:
     void createNetworkRoot(const NetworkInfo &net_info);                                      // создать корневой узел сеть
     void splitNetworkItem(const QModelIndex &parentIndex);                                    // разделить сеть на подсети
     void mergeNetworkItem(const QModelIndex &parentIndex);                                    // объединить подсети в сеть
-    void writeNetworkInFile();
-    void readNetworkOfFile();
+    void expandAllExist();                                                                    // раскрыть все cуществующие p.s. довольно тяжёлая операция
+    void writeNetworkInFile();                                                                // записать модель в файл
+    void readNetworkOfFile();                                                                 // считать модель из файла
+
+signals:
+    void needExpandItem(const QModelIndex&);                                                  // сигнализирует представлению о необходимости
+                                                                                              // раскрыть элемент с указанным индексом
 };
 
 #endif // NETWORKTREEMODEL_H

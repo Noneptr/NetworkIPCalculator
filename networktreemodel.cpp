@@ -57,22 +57,32 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
         while (true)
         {
             NetworkInfo curr_info = stringToNetInfo(curr->text());          // получение сетевых данных о текущем узле
-            IPrecord mid_host = curr_info.directBroadcast() - curr_info.directBroadcast() / 2;
+            IPrecord mid_host = curr_info.directBroadcast() - curr_info.wildcard() / 2;
             if (net_info.directBroadcast() < mid_host)                      // если меньше среднего адреса сети узла
             {
                 if (curr->rowCount() == 1)
                 {
+                    //=============================================================================================
+                    QString child0data = curr->child(0)->text();
+                    if (child0data != __emptySign__)
+                    {
+                        NetworkInfo child_info = stringToNetInfo(child0data);
+                        if (child_info.directBroadcast() < mid_host)
+                        {
+                            curr = curr->child(0);
+                            continue;
+                        }
+                    }
+                    //=============================================================================================
+
                     createNetworkItem(curr, net_info);                      // создаём и присоединяем новый узел
-                    if (curr->text() == __emptySign__)
+                    if (child0data == __emptySign__)
                     {
                         curr->removeRow(0);                                 // удаления пустого символа
                     }
                     else                                                    // нарушение структуры т.к. правый узел стоит первым
                     {
-                        QStandardItem *left = curr->child(1);               // восстановление структуры сыновей, путём перестановки их местами
-                        QStandardItem *right = curr->child(0);
-                        curr->insertRow(0, left);
-                        curr->insertRow(1, right);
+                        curr->sortChildren(0);                              // восстановление структуры сыновей, путём перестановки их местами
                     }
                     break;
                 }
@@ -89,8 +99,20 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
             {
                 if (curr->rowCount() == 1)
                 {
+                    //=============================================================================================
+                    QString child0data = curr->child(0)->text();
+                    if (child0data != __emptySign__)
+                    {
+                        NetworkInfo child_info = stringToNetInfo(child0data);
+                        if (child_info.directBroadcast() >= mid_host)
+                        {
+                            curr = curr->child(0);
+                            continue;
+                        }
+                    }
+                    //=============================================================================================
                     createNetworkItem(curr, net_info);                       // создаём и присоединяем новый узел
-                    if (curr->text() == __emptySign__)
+                    if (curr->child(0)->text() == __emptySign__)
                     {
                         curr->removeRow(0);                                  // удаление пустого символа
                     }
@@ -104,6 +126,31 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
                 {
                     break;                                                  // достигнут самый нижний уровень дерева, выход из вставки
                 }
+            }
+        }
+    }
+}
+
+
+void NetworkTreeModel::expandAllExist()
+{
+    QStandardItem *parent = invisibleRootItem();
+    if (parent->rowCount() > 0)
+    {
+        QStandardItem *root = parent->child(0);
+        std::queue<QStandardItem *> nodes;
+        nodes.push(root);
+        QStandardItem *curr;
+        while(!nodes.empty())                                           // обход дерева в ширину
+        {
+            curr = nodes.front();
+            nodes.pop();
+
+            if (curr->rowCount() > 1)                                   // если у узла два сына значит его необходимо раскрыть
+            {
+                emit needExpandItem(curr->index());
+                nodes.push(curr->child(0));
+                nodes.push(curr->child(1));
             }
         }
     }
@@ -185,12 +232,70 @@ QString NetworkTreeModel::filename() const
 
 void NetworkTreeModel::writeNetworkInFile()
 {
+    FILE *file = nullptr;
+    file = fopen((__filename + __file_extention__).toStdString().c_str(), "wb");
+    if (file)
+    {
+        QStandardItem *parent = invisibleRootItem();
+        if (parent->rowCount() > 0)
+        {
+            QStandardItem *root = parent->child(0);
+            std::queue<QStandardItem *> nodes;
+            nodes.push(root);
+            QStandardItem *curr;
+            while(!nodes.empty())                                           // обход дерева в ширину
+            {
+                curr = nodes.front();
+                nodes.pop();
 
+                if (curr->text() == "&")
+                {
+                    continue;
+                }
+
+                NetworkInfo net_info = stringToNetInfo(curr->text());
+
+                fwrite(&net_info, sizeof(net_info), 1, file);
+
+                for (int i = 0; i < curr->rowCount(); i++)
+                {
+                    nodes.push(curr->child(i));
+                }
+            }
+        }
+        fclose(file);
+    }
+    else
+    {
+        throw __ERROR_WRITE_IN_BIN_FILE__;
+    }
 }
 
 
 void NetworkTreeModel::readNetworkOfFile()
 {
+    FILE *file = nullptr;
+    file = fopen((__filename + __file_extention__).toStdString().c_str(), "rb");
+    if (file)
+    {
+        this->clear();
+        setHorizontalHeaderLabels({QString("")});
+
+        NetworkInfo net_info;
+        while (fread(&net_info, sizeof(net_info), 1, file) == 1)
+        {
+            insertIntoNetwork(net_info);
+        }
+
+        fclose(file);
+
+        // чтение быстрее чем расширение
+        expandAllExist();
+    }
+    else
+    {
+        throw __ERROR_READ_OF_BIN_FILE__;
+    }
 }
 
 

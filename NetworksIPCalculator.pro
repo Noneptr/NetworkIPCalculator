@@ -21,14 +21,16 @@ SOURCES += \
     mainwindow.cpp \
     netmask.cpp \
     networkinfo.cpp \
-    networktreemodel.cpp
+    networktreemodel.cpp \
+    networktreeview.cpp
 
 HEADERS += \
     iprecord.h \
     mainwindow.h \
     netmask.h \
     networkinfo.h \
-    networktreemodel.h
+    networktreemodel.h \
+    networktreeview.h
 
 FORMS += \
     mainwindow.ui

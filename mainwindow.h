@@ -9,6 +9,7 @@
 #include <QAbstractItemView>
 #include "networkinfo.h"
 #include "networktreemodel.h"
+#include "networktreeview.h"
 #include <queue>
 
 
@@ -25,8 +26,12 @@ public:
     ~MainWindow();
 
 public slots:
-    void alignColumnsInTreeView();
 //    void createSubNet(int count);
+
+private slots:
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
 
 private:
     Ui::MainWindow *ui;
