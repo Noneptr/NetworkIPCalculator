@@ -25,9 +25,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-public slots:
-//    void createSubNet(int count);
-
 private slots:
     void on_pushButton_clicked();
 
