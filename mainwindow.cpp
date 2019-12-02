@@ -19,6 +19,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setIndentation(75);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование содержимого узлов дерева
 
+    unsigned int val = 	60;
+    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
+
+    val = 	30;
+    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
+
+    val = 	18;
+    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
+
+    val = 	12;
+    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
+
+    val = 	8;
+    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
+
 //    for (QString &s: NetworkTreeModel::netInfoToString(NetworkInfo(IPrecord(192, 168, 0, 0), NetMask(31))).split('\n'))
 //    {
 //        qDebug() << s;
@@ -40,4 +55,9 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     model->readNetworkOfFile();
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    model->expandAllExist();
 }

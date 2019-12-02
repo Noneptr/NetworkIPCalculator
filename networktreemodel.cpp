@@ -38,9 +38,9 @@ QString NetworkTreeModel::netInfoToString(const NetworkInfo &net_info)
 NetworkInfo NetworkTreeModel::stringToNetInfo(const QString &data)
 {
     QStringList list = data.split("\n");
-    IPrecord net_ip(list[0].split(" ")[1]);                                     // выделить из данных адрес сети
-    NetMask net_mask(list[2].split(" ")[1]);                                    // выделить из данных маску сети
-    unsigned int busy_hosts = list[8].split(" ")[1].toUInt();                   // выделить из данных количество занятых хостов
+    IPrecord net_ip(list[0].split(": ")[1]);                                     // выделить из данных адрес сети
+    NetMask net_mask(list[2].split(": ")[1]);                                    // выделить из данных маску сети
+    unsigned int busy_hosts = list[8].split(": ")[1].toUInt();                   // выделить из данных количество занятых хостов
     NetworkInfo net_info(net_ip, net_mask);
     net_info.setBusyHosts(busy_hosts);
     return net_info;
@@ -165,7 +165,7 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
     QStandardItem *node = new QStandardItem(data);
 
     NetMask subMask = NetMask(net_info.mask().countBits() + 1);
-    if (subMask.countHosts() >= 2)                                                      // проверка на то что может ли существовать следующий узел
+    if ((subMask.countHosts() >= 2) && (net_info.busyHosts() == 0))                     // проверка на то что может ли существовать следующий узел
     {
         node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
     }
@@ -220,6 +220,58 @@ void NetworkTreeModel::mergeNetworkItem(const QModelIndex &parentIndex)
 void NetworkTreeModel::setFilename(const QString &filename)
 {
     __filename = filename;
+}
+
+
+void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_hosts)
+{
+    if (node && busy_hosts > 0)
+    {
+        QString data = node->text();
+        if (data != __emptySign__)
+        {
+            NetworkInfo node_info = stringToNetInfo(data);
+
+            if (node_info.busyHosts() == 0)
+            {
+                long long unsigned int e = 10 *
+                static_cast<long long unsigned int>(pow(10, unsigned(QString::number(busy_hosts).count())));
+                qDebug() << "e: " << e;
+                qDebug() << "op1: " << log2(node_info.mask().countHosts());
+                qDebug() << "op2: " << log2(busy_hosts);
+
+                double val = round((log2(node_info.mask().countHosts())
+                            - log2(busy_hosts)) * e) / e;
+
+                qDebug() << "fact_val: " << log2(node_info.mask().countHosts())
+                             - log2(busy_hosts);
+                qDebug() << "round_val: " << val;
+                qDebug() << endl;
+
+                if (val >= 0)
+                {
+                    if (val <= 1)
+                    {
+                        node_info.setBusyHosts(busy_hosts);
+                        node->setText(netInfoToString(node_info));
+                        node->removeRows(0, node->rowCount());
+                        busy_hosts = 0;
+                    }
+                    else
+                    {
+                        if (node->rowCount() == 1)
+                        {
+                            //qDebug() << node->parent()->text() << endl;
+                            splitNetworkItem(node->index());
+                        }
+
+                        makeBusyNode(node->child(0), busy_hosts);
+                        makeBusyNode(node->child(1), busy_hosts);
+                    }
+                }
+            }
+        }
+    }
 }
 
 
