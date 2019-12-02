@@ -1,5 +1,6 @@
 #include "networkinfo.h"
 
+
 NetworkInfo::NetworkInfo(const IPrecord &ip, const NetMask &m)
 {
     calculateNet(ip, m);
@@ -8,9 +9,9 @@ NetworkInfo::NetworkInfo(const IPrecord &ip, const NetMask &m)
 
 NetworkInfo::NetworkInfo(const IPrecord &_net, const NetMask &_mask,
             const IPrecord &_wildcard, const IPrecord &_broadcast,
-            const IPrecord &_host_min, const IPrecord &_host_max)
+            const IPrecord &_host_min, const IPrecord &_host_max, unsigned int busy_hosts)
 {
-    setInfo(_net, _mask, _wildcard, _broadcast, _host_min, _host_max);
+    setInfo(_net, _mask, _wildcard, _broadcast, _host_min, _host_max, busy_hosts);
 }
 
 
@@ -22,12 +23,13 @@ void NetworkInfo::calculateNet(const IPrecord &ip, const NetMask &m)
     __broadcast = __network + __wildcard;
     __host_min = __network + 1;
     __host_max = __broadcast - 1;
+    __busy_hosts = 0;
 }
 
 
 void NetworkInfo::setInfo(const IPrecord &_net, const NetMask &_mask,
              const IPrecord &_wildcard, const IPrecord &_broadcast,
-             const IPrecord &_host_min, const IPrecord &_host_max)
+             const IPrecord &_host_min, const IPrecord &_host_max, unsigned int busy_hosts)
 {
     setNetwork(_net);
     setMask(_mask);
@@ -35,6 +37,7 @@ void NetworkInfo::setInfo(const IPrecord &_net, const NetMask &_mask,
     setDirectBroadcast(_broadcast);
     setHostMin(_host_min);
     setHostMax(_host_max);
+    setBusyHosts(busy_hosts);
 }
 
 
@@ -73,6 +76,19 @@ void NetworkInfo::setHostMax(const IPrecord &hmax)
     __host_max = hmax;
 }
 
+void NetworkInfo::setBusyHosts(unsigned int busy_hosts)
+{
+    if (busy_hosts <= __mask.countHosts())
+    {
+        __busy_hosts = busy_hosts;
+    }
+    else
+    {
+        throw ValueBusyHostsError;
+        /* мы не можем установить количество занятых хостов больше, чем у нас свободных */
+    }
+}
+
 
 IPrecord NetworkInfo::network() const
 {
@@ -107,4 +123,10 @@ IPrecord NetworkInfo::hostMin() const
 IPrecord NetworkInfo::hostMax() const
 {
     return __host_max;
+}
+
+
+unsigned int NetworkInfo::busyHosts() const
+{
+    return __busy_hosts;
 }

@@ -2,7 +2,8 @@
 
 QVector<QString> NetworkTreeModel::__signs__ = {"Adress: ", "BitMask: ", "Mask: ",
                                                 "Wildcard: ", "Direct broadcast: ",
-                                                "Host min: ", "Host max: ", "Hosts: ", "Busy hosts: "};
+                                                "Host min: ", "Host max: ", "Free hosts: ",
+                                                "Busy hosts: "};
 
 QString NetworkTreeModel::__emptySign__ = "&";
 
@@ -28,7 +29,8 @@ QString NetworkTreeModel::netInfoToString(const NetworkInfo &net_info)
             __signs__[4] + net_info.directBroadcast().toQString() + "\n" +
             __signs__[5] + net_info.hostMin().toQString() + "\n" +
             __signs__[6] + net_info.hostMax().toQString() + "\n" +
-            __signs__[7] + QString::number(net_info.mask().countHosts());
+            __signs__[7] + QString::number(net_info.mask().countHosts() - net_info.busyHosts()) + "\n" +
+            __signs__[8] + QString::number(net_info.busyHosts());
     return data;
 }
 
@@ -38,7 +40,9 @@ NetworkInfo NetworkTreeModel::stringToNetInfo(const QString &data)
     QStringList list = data.split("\n");
     IPrecord net_ip(list[0].split(" ")[1]);                                     // выделить из данных адрес сети
     NetMask net_mask(list[2].split(" ")[1]);                                    // выделить из данных маску сети
+    unsigned int busy_hosts = list[8].split(" ")[1].toUInt();                   // выделить из данных количество занятых хостов
     NetworkInfo net_info(net_ip, net_mask);
+    net_info.setBusyHosts(busy_hosts);
     return net_info;
 }
 
