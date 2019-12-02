@@ -225,53 +225,66 @@ void NetworkTreeModel::setFilename(const QString &filename)
 
 void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_hosts)
 {
-    if (node && busy_hosts > 0)
+    if (node && busy_hosts > 0)         /* проверка статуса выполнения задачи, busy_host = 0 - задача выполнена (выход из рекурсии)*/
     {
-        QString data = node->text();
-        if (data != __emptySign__)
+        NetworkInfo node_info = stringToNetInfo(node->text());              // получение сетевой информации о текущем узле
+
+        if (node_info.busyHosts() == 0)                                     // если узел не имеет занятых хостов, то идём дальше, иначе выход
         {
-            NetworkInfo node_info = stringToNetInfo(data);
+            long long unsigned int e = 10 *
+            static_cast<long long unsigned int>(pow(10, unsigned(QString::number(busy_hosts).count())));
 
-            if (node_info.busyHosts() == 0)
+            /* e - говорит нам о точности результата разности двух чисел
+             * например,
+                         e = 1000; val = 19.2428;
+                         ans = round(val * e)/e;    // ans == 19.243
+             * например,
+                         e = 100; val = 19.2428;
+                         ans = round(val * e)/e;    // ans == 19.24
+            */
+
+            double val = round((log2(node_info.mask().countHosts())
+                        - log2(busy_hosts)) * e) / e;
+
+            /*
+             * val - разность логарифмов количества имеющихся хостов и количества необходимых для занятости
+            */
+
+            if (val >= 0)                       // случай когда кол-во необходимых для занятости хостов меньше или равно кол-ву имеющихся
             {
-                long long unsigned int e = 10 *
-                static_cast<long long unsigned int>(pow(10, unsigned(QString::number(busy_hosts).count())));
-                qDebug() << "e: " << e;
-                qDebug() << "op1: " << log2(node_info.mask().countHosts());
-                qDebug() << "op2: " << log2(busy_hosts);
-
-                double val = round((log2(node_info.mask().countHosts())
-                            - log2(busy_hosts)) * e) / e;
-
-                qDebug() << "fact_val: " << log2(node_info.mask().countHosts())
-                             - log2(busy_hosts);
-                qDebug() << "round_val: " << val;
-                qDebug() << endl;
-
-                if (val >= 0)
+                if (val <= 1)                   // случай когда кол-во необходимых для занятости хостов может разместиться в узле
                 {
-                    if (val <= 1)
+                    node_info.setBusyHosts(busy_hosts);
+                    node->setText(netInfoToString(node_info));
+                    node->removeRows(0, node->rowCount());
+                    busy_hosts = 0;
+                }
+                else                            // случай когда кол-во свободных хостов сильно превышает кол-во необходимых для занятости хостов
+                {
+                    if (node->rowCount() == 1)              // если узел не был разделён разделить
                     {
-                        node_info.setBusyHosts(busy_hosts);
-                        node->setText(netInfoToString(node_info));
-                        node->removeRows(0, node->rowCount());
-                        busy_hosts = 0;
+                        splitNetworkItem(node->index());
                     }
-                    else
-                    {
-                        if (node->rowCount() == 1)
-                        {
-                            //qDebug() << node->parent()->text() << endl;
-                            splitNetworkItem(node->index());
-                        }
 
-                        makeBusyNode(node->child(0), busy_hosts);
-                        makeBusyNode(node->child(1), busy_hosts);
-                    }
+                    makeBusyNode(node->child(0), busy_hosts);           // спуститься по левой ветви
+                    makeBusyNode(node->child(1), busy_hosts);           // спуститься по правой ветви
                 }
             }
         }
     }
+}
+
+void NetworkTreeModel::makeBusyNodes(const QVector<unsigned int> &vals)
+{
+    QStandardItem *root = invisibleRootItem()->child(0);
+    QVector<unsigned int> vector = vals;
+    __sort_qvector_helper__::selectUpSortQVector(vector);                       // сортировка полученной последовательности
+    for (unsigned int &e: vector)
+    {
+        makeBusyNode(root, e);
+    }
+
+    expandAllExist();
 }
 
 

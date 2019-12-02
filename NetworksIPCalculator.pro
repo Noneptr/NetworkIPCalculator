@@ -22,7 +22,8 @@ SOURCES += \
     netmask.cpp \
     networkinfo.cpp \
     networktreemodel.cpp \
-    networktreeview.cpp
+    networktreeview.cpp \
+    sort_qvector_helper.cpp
 
 HEADERS += \
     iprecord.h \
@@ -30,7 +31,8 @@ HEADERS += \
     netmask.h \
     networkinfo.h \
     networktreemodel.h \
-    networktreeview.h
+    networktreeview.h \
+    sort_qvector_helper.h
 
 FORMS += \
     mainwindow.ui
