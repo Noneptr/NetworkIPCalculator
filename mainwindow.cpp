@@ -19,21 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setIndentation(75);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование содержимого узлов дерева
 
-//    unsigned int val = 	60;
-//    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
-
-//    val = 	30;
-//    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
-
-//    val = 	18;
-//    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
-
-//    val = 	12;
-//    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
-
-//    val = 	8;
-//    model->makeBusyNode(model->invisibleRootItem()->child(0), val);
-
     QVector<unsigned int> v = {60, 30, 8, 12, 18};
     model->makeBusyNodes(v);
 
