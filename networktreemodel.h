@@ -74,13 +74,17 @@ public slots:
     //=====================================================================================================================
 
     //========================== Разделение сети по заданным параметрам ===================================================
-    void makeBusyNode(QStandardItem *node, unsigned int &busy_hosts);                          // сделать узел с занятым хостом
-    void makeBusyNodes(const QVector<unsigned int> &vals);                                     // сделать узлов с занятыми хостами
+    void makeBusyNode(QStandardItem *node, unsigned int &busy_hosts);                          // сделать подсеть с занятыми хостами
+    void makeBusyNodes(const QVector<unsigned int> &vals);                                     // сделать подсети с занятыми хостами
     //=====================================================================================================================
 
 signals:
     void needExpandItem(const QModelIndex&);                                                  // сигнализирует представлению о необходимости
                                                                                               // раскрыть элемент с указанным индексом
+
+    void fileReaded();                                                                        // сигнализирует о том, что файл прочитан
+    void makedBusyNodes();                                                                    // сигнал о том, что подсети сделаны
+    void notMakedBusyNodes(const QVector<unsigned int> &);                                    // сигнал о том, какие подсети не могут быть сделаны
 };
 
 #endif // NETWORKTREEMODEL_H

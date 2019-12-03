@@ -11,6 +11,8 @@ QString NetworkTreeModel::__emptySign__ = "&";
 NetworkTreeModel::NetworkTreeModel(QObject *parent)
     :QStandardItemModel(parent), __filename("new_net_tree")
 {
+    connect(this, SIGNAL(fileReaded()), this, SLOT(expandAllExist()));
+    connect(this, SIGNAL(makedBusyNodes()), this, SLOT(expandAllExist()));
 }
 
 NetworkTreeModel::NetworkTreeModel(const QString &filename, QObject *parent)
@@ -284,7 +286,21 @@ void NetworkTreeModel::makeBusyNodes(const QVector<unsigned int> &vals)
         makeBusyNode(root, e);
     }
 
-    expandAllExist();
+    emit makedBusyNodes();                                                      // узлы с занятыми хостами сделаны
+
+    QVector<unsigned int> notMakedVector;
+    for (unsigned int e: vector)
+    {
+        if (e != 0)
+        {
+            notMakedVector.append(e);
+        }
+    }
+
+    if (notMakedVector.size() > 0)
+    {
+        emit notMakedBusyNodes(notMakedVector);                                     // сигнал говорит о том какие подсети не могут быть добавлены
+    }
 }
 
 
@@ -350,9 +366,7 @@ void NetworkTreeModel::readNetworkOfFile()
 
         fclose(file);
 
-        // раскрытие довольно дорогая операция
-        // чтение происходит быстрее
-        expandAllExist();                                               // раскрытие всех существующих узлов
+        emit fileReaded();                                              // файл прочитан
     }
     else
     {
