@@ -236,6 +236,19 @@ void NetworkTreeModel::setFilename(const QString &filename)
 }
 
 
+void NetworkTreeModel::changeBusyHostInNode(QStandardItem *node, NetworkInfo &net_info ,unsigned int &busy_hosts)
+{
+    net_info.setBusyHosts(busy_hosts);
+    node->setText(netInfoToString(net_info));
+    node->removeRows(0, node->rowCount());
+    busy_hosts = 0;
+
+    //================== Установка иконки ===================================================
+    node->setIcon(QIcon(QPixmap(__ico_busy_net__)));
+    //=======================================================================================
+}
+
+
 void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_hosts)
 {
     if (node && busy_hosts > 0)         /* проверка статуса выполнения задачи, busy_host = 0 - задача выполнена (выход из рекурсии)*/
@@ -267,14 +280,7 @@ void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_host
             {
                 if (val <= 1)                   // случай когда кол-во необходимых для занятости хостов может разместиться в узле
                 {
-                    node_info.setBusyHosts(busy_hosts);
-                    node->setText(netInfoToString(node_info));
-                    node->removeRows(0, node->rowCount());
-                    busy_hosts = 0;
-
-                    //================== Установка иконки ===================================================
-                    node->setIcon(QIcon(QPixmap(__ico_busy_net__)));
-                    //=======================================================================================
+                    changeBusyHostInNode(node, node_info, busy_hosts);          // изменение состояния занятости подсети
                 }
                 else                            // случай когда кол-во свободных хостов сильно превышает кол-во необходимых для занятости хостов
                 {
@@ -290,6 +296,25 @@ void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_host
         }
     }
 }
+
+
+void NetworkTreeModel::userMakeBusyNode(const QModelIndex &index, unsigned int busy_hosts)
+{
+    QStandardItem *parent = static_cast<QStandardItem*>(index.internalPointer());
+    QStandardItem *netItem = parent->child(index.row());
+    QString data = netItem->text();
+    NetworkInfo net_info = stringToNetInfo(data);
+    if (busy_hosts <= net_info.mask().countHosts())
+    {
+        changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
+    }
+    else
+    {
+        throw __ERROR_USER_MAKE_BUSY_NODE__;
+        /* количество занимаемых хостов должно не превышать количества имеющихся */
+    }
+}
+
 
 void NetworkTreeModel::makeBusyNodes(const QVector<unsigned int> &vals)
 {

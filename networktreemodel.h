@@ -16,7 +16,8 @@
     subnet1        subnet2 */
 
 
-enum NetworkTreeModelError {__ERROR_WRITE_IN_BIN_FILE__, __ERROR_READ_OF_BIN_FILE__};       // Исключения вызываемые классом
+enum NetworkTreeModelError {__ERROR_WRITE_IN_BIN_FILE__, __ERROR_READ_OF_BIN_FILE__,
+                           __ERROR_USER_MAKE_BUSY_NODE__};                                  // Исключения вызываемые классом
 
 const QString __file_extention__ = ".ipcalc";                                               // расширение бинарного файла с сетевой схемой
 
@@ -39,12 +40,15 @@ public:
        что имеющие его элементы должны иметь возможность разделения,
        а не имеющие нет*/
 
-    static QString __ico_busy_net__;
+    static QString __ico_busy_net__;                                                        // путь к файлу иконки занятой сети
 
     // ================ функции преобразования NetworkInfo в QString и обратно ======================
     static QString netInfoToString(const NetworkInfo &net_info);
     static NetworkInfo stringToNetInfo(const QString &data);
     //===============================================================================================
+
+private:
+    static void changeBusyHostInNode(QStandardItem *node, NetworkInfo &net_info, unsigned int &busy_hosts);         // изменение состояния занятости подсети
 
 public:
     NetworkTreeModel(QObject *parent = nullptr);
@@ -76,8 +80,9 @@ public slots:
     //=====================================================================================================================
 
     //========================== Разделение сети по заданным параметрам ===================================================
-    void makeBusyNode(QStandardItem *node, unsigned int &busy_hosts);                          // сделать подсеть с занятыми хостами
-    void makeBusyNodes(const QVector<unsigned int> &vals);                                     // сделать подсети с занятыми хостами
+    void makeBusyNode(QStandardItem *node, unsigned int &busy_hosts);                          // модельное выделение подсети с занятыми хостами
+    void makeBusyNodes(const QVector<unsigned int> &vals);                                     // модельное выделение подсетей с занятыми хостами
+    void userMakeBusyNode(const QModelIndex &index, unsigned int busy_hosts);                  // пользовательское выделение подсети с занятыми хостами
     //=====================================================================================================================
 
 signals:
