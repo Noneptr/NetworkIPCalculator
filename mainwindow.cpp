@@ -23,6 +23,18 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "}";
     });                                                                         // реакция на не выделенные подсети
 
+    connect(ui->treeView, &NetworkTreeView::doubleClicked,
+            [](const QModelIndex &index)
+    {
+        QStandardItem *parent = static_cast<QStandardItem*>(index.internalPointer());
+        QString data = parent->child(index.row())->text();
+        for(QString &s : data.split("\n"))
+        {
+            qDebug() << s;
+        }
+        qDebug() << endl;
+    });                                                                         // реакция на попытку редактировать узел
+
     model->setHorizontalHeaderLabels({QString("")});
     model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
 
@@ -30,8 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setIndentation(75);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование содержимого узлов дерева
 
-//    QVector<unsigned int> v = {60, 30, 8, 12, 18};
-    QVector<unsigned int> v = {62, 62, 62, 62, 2, 2, 3};
+    //QVector<unsigned int> v = {60, 30, 8, 12, 18};
+    QVector<unsigned int> v = {62, 62, 62, 30, 2, 2, 3};
     model->makeBusyNodes(v);
 }
 

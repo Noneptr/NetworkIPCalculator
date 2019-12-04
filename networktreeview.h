@@ -3,12 +3,14 @@
 
 
 #include <QTreeView>
+#include <QDebug>
 
 class NetworkTreeView: public QTreeView
 {
     Q_OBJECT
 public:
     NetworkTreeView(QWidget *parent = nullptr);
+
     ~NetworkTreeView();
 
 public slots:

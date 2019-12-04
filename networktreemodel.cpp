@@ -2,10 +2,13 @@
 
 QVector<QString> NetworkTreeModel::__signs__ = {"Adress: ", "BitMask: ", "Mask: ",
                                                 "Wildcard: ", "Direct broadcast: ",
-                                                "Host min: ", "Host max: ", "Free hosts: ",
-                                                "Busy hosts: "};
+                                                "Host min: ", "Host max: ", "Total hosts: ",
+                                                "Busy hosts: ", "Free hosts: "};
 
 QString NetworkTreeModel::__emptySign__ = "&";
+
+
+QBrush NetworkTreeModel::__color_busy_node__ = QBrush(QColor(250, 128, 114, 100));
 
 
 NetworkTreeModel::NetworkTreeModel(QObject *parent)
@@ -31,8 +34,9 @@ QString NetworkTreeModel::netInfoToString(const NetworkInfo &net_info)
             __signs__[4] + net_info.directBroadcast().toQString() + "\n" +
             __signs__[5] + net_info.hostMin().toQString() + "\n" +
             __signs__[6] + net_info.hostMax().toQString() + "\n" +
-            __signs__[7] + QString::number(net_info.mask().countHosts() - net_info.busyHosts()) + "\n" +
-            __signs__[8] + QString::number(net_info.busyHosts());
+            __signs__[7] + QString::number(net_info.mask().countHosts()) + "\n" +
+            __signs__[8] + QString::number(net_info.busyHosts()) + "\n" +
+            __signs__[9] + QString::number(net_info.mask().countHosts() - net_info.busyHosts());
     return data;
 }
 
@@ -173,6 +177,14 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
     }
 
     parent->appendRow(node);
+
+//    //================== Код покраски подсети с занятыми хостами =============================
+//    node->setBackground(QBrush(QColor(211, 211, 211, 100)));
+//    if (net_info.busyHosts() > 0)
+//    {
+//        node->setBackground(__color_busy_node__);
+//    }
+//    //=======================================================================================
 }
 
 
@@ -260,6 +272,10 @@ void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_host
                     node->setText(netInfoToString(node_info));
                     node->removeRows(0, node->rowCount());
                     busy_hosts = 0;
+
+//                    //================== Код покраски подсети с занятыми хостами ============================
+//                    node->setBackground(__color_busy_node__);
+//                    //=======================================================================================
                 }
                 else                            // случай когда кол-во свободных хостов сильно превышает кол-во необходимых для занятости хостов
                 {
