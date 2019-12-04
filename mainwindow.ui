@@ -41,49 +41,25 @@ QTreeView::item {
 	 border-radius: 0.25em;
 	 min-width: 20em;
 	 max-width: 20em;
+	 background: #ffffff;
 }
 
 
-QTreeView::item:!has-children {
-   	background: rgba(54, 217, 134, 0.8);
-}
-
-QTreeView::item:has-children {
-   	background: #ffffff;
-}
-
-QTreeView::item:has-children:hover {
+QTreeView::item:hover {
     background: #cbdaf1;
     border: 1px solid #bfcde4;
 }
 
-QTreeView::item:has-children:selected {
+QTreeView::item:selected {
     border: 1px solid #567dbc;
 }
 
-QTreeView::item:has-children:selected:active{
-    background: #6ea1f1;
+QTreeView::item:selected:active{
+    background: rgba(110, 161, 241, 0.7);
 }
 
-QTreeView::item:has-children:selected:!active {
-    background: #6b9be8;
-}
-
-QTreeView::item:!has-children:hover {
-    background: rgba(98, 217, 156, 0.8);
-    border: 1px solid #bfcde4;
-}
-
-QTreeView::item:!has-children:selected {
-    border: 1px solid #567dbc;
-}
-
-QTreeView::item:!has-children:selected:active{
-    background: rgba(0, 179, 88, 0.8);
-}
-
-QTreeView::item:!has-children:selected:!active {
-    background: rgba(0, 179, 88, 0.8);
+QTreeView::item:selected:!active {
+    background: rgba(110, 161, 241, 0.7);
 }</string>
       </property>
       <property name="horizontalScrollBarPolicy">

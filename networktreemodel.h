@@ -39,7 +39,7 @@ public:
        что имеющие его элементы должны иметь возможность разделения,
        а не имеющие нет*/
 
-    static QBrush __color_busy_node__;
+    static QString __ico_busy_net__;
 
     // ================ функции преобразования NetworkInfo в QString и обратно ======================
     static QString netInfoToString(const NetworkInfo &net_info);

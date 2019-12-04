@@ -8,7 +8,7 @@ QVector<QString> NetworkTreeModel::__signs__ = {"Adress: ", "BitMask: ", "Mask: 
 QString NetworkTreeModel::__emptySign__ = "&";
 
 
-QBrush NetworkTreeModel::__color_busy_node__ = QBrush(QColor(75, 0, 130, 255));
+QString NetworkTreeModel::__ico_busy_net__ = ":/rec/icons/busy_network.png";
 
 
 NetworkTreeModel::NetworkTreeModel(QObject *parent)
@@ -178,13 +178,12 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
 
     parent->appendRow(node);
 
-//    //================== Код покраски подсети с занятыми хостами =============================
+    //================== Установка иконки если узел занятыми хостами ========================
     if (net_info.busyHosts() > 0)
     {
-        node->setBackground(__color_busy_node__);
-        node->setForeground(__color_busy_node__);
+        node->setIcon(QIcon(QPixmap(__ico_busy_net__)));
     }
-//    //=======================================================================================
+    //=======================================================================================
 }
 
 
@@ -273,10 +272,9 @@ void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_host
                     node->removeRows(0, node->rowCount());
                     busy_hosts = 0;
 
-//                    //================== Код покраски подсети с занятыми хостами ============================
-                    node->setBackground(__color_busy_node__);
-                    node->setForeground(__color_busy_node__);
-//                    //=======================================================================================
+                    //================== Установка иконки ===================================================
+                    node->setIcon(QIcon(QPixmap(__ico_busy_net__)));
+                    //=======================================================================================
                 }
                 else                            // случай когда кол-во свободных хостов сильно превышает кол-во необходимых для занятости хостов
                 {
