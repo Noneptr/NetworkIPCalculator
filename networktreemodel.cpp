@@ -8,7 +8,7 @@ QVector<QString> NetworkTreeModel::__signs__ = {"Adress: ", "BitMask: ", "Mask: 
 QString NetworkTreeModel::__emptySign__ = "&";
 
 
-QBrush NetworkTreeModel::__color_busy_node__ = QBrush(QColor(250, 128, 114, 100));
+QBrush NetworkTreeModel::__color_busy_node__ = QBrush(QColor(75, 0, 130, 255));
 
 
 NetworkTreeModel::NetworkTreeModel(QObject *parent)
@@ -179,11 +179,11 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
     parent->appendRow(node);
 
 //    //================== Код покраски подсети с занятыми хостами =============================
-//    node->setBackground(QBrush(QColor(211, 211, 211, 100)));
-//    if (net_info.busyHosts() > 0)
-//    {
-//        node->setBackground(__color_busy_node__);
-//    }
+    if (net_info.busyHosts() > 0)
+    {
+        node->setBackground(__color_busy_node__);
+        node->setForeground(__color_busy_node__);
+    }
 //    //=======================================================================================
 }
 
@@ -274,7 +274,8 @@ void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_host
                     busy_hosts = 0;
 
 //                    //================== Код покраски подсети с занятыми хостами ============================
-//                    node->setBackground(__color_busy_node__);
+                    node->setBackground(__color_busy_node__);
+                    node->setForeground(__color_busy_node__);
 //                    //=======================================================================================
                 }
                 else                            // случай когда кол-во свободных хостов сильно превышает кол-во необходимых для занятости хостов

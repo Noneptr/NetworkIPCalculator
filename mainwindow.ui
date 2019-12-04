@@ -20,8 +20,71 @@
       <property name="enabled">
        <bool>true</bool>
       </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
       <property name="styleSheet">
-       <string notr="true"/>
+       <string notr="true">QTreeView {
+    show-decoration-selected: 1;
+}
+
+QTreeView::item {
+     border: 1px solid #d7d8db;
+	 padding: 0.5em 1em 0.5em 1em;
+	 margin: 0.5em 1em 0.5em 0em;
+	 border-radius: 0.25em;
+	 min-width: 20em;
+	 max-width: 20em;
+}
+
+
+QTreeView::item:!has-children {
+   	background: rgba(54, 217, 134, 0.8);
+}
+
+QTreeView::item:has-children {
+   	background: #ffffff;
+}
+
+QTreeView::item:has-children:hover {
+    background: #cbdaf1;
+    border: 1px solid #bfcde4;
+}
+
+QTreeView::item:has-children:selected {
+    border: 1px solid #567dbc;
+}
+
+QTreeView::item:has-children:selected:active{
+    background: #6ea1f1;
+}
+
+QTreeView::item:has-children:selected:!active {
+    background: #6b9be8;
+}
+
+QTreeView::item:!has-children:hover {
+    background: rgba(98, 217, 156, 0.8);
+    border: 1px solid #bfcde4;
+}
+
+QTreeView::item:!has-children:selected {
+    border: 1px solid #567dbc;
+}
+
+QTreeView::item:!has-children:selected:active{
+    background: rgba(0, 179, 88, 0.8);
+}
+
+QTreeView::item:!has-children:selected:!active {
+    background: rgba(0, 179, 88, 0.8);
+}</string>
       </property>
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAsNeeded</enum>
