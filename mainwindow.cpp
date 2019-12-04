@@ -34,14 +34,19 @@ MainWindow::MainWindow(QWidget *parent)
         }
         qDebug() << endl;
 
-        try
+        NetInputDialog dialog("Введите количество занятых: ", "Изменить", "Отмена", this);
+
+        if (dialog.exec() == QDialog::Accepted)
         {
-            model->userMakeBusyNode(index, 14);
-        }
-        catch (NetworkTreeModelError &error)
-        {
-            if (error == __ERROR_USER_MAKE_BUSY_NODE__)
-            qDebug() << "No maked!!!" << endl;
+            try
+            {
+                model->userMakeBusyNode(index, 14);
+            }
+            catch (NetworkTreeModelError &error)
+            {
+                if (error == __ERROR_USER_MAKE_BUSY_NODE__)
+                qDebug() << "No maked!!!" << endl;
+            }
         }
     });                                                                         // реакция на попытку редактировать узел
 

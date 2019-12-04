@@ -19,6 +19,7 @@ SOURCES += \
     iprecord.cpp \
     main.cpp \
     mainwindow.cpp \
+    netinputdialog.cpp \
     netmask.cpp \
     networkinfo.cpp \
     networktreemodel.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
 HEADERS += \
     iprecord.h \
     mainwindow.h \
+    netinputdialog.h \
     netmask.h \
     networkinfo.h \
     networktreemodel.h \

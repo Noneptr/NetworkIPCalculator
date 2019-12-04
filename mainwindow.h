@@ -11,6 +11,7 @@
 #include "networktreemodel.h"
 #include "networktreeview.h"
 #include <queue>
+#include "netinputdialog.h"
 
 
 QT_BEGIN_NAMESPACE
