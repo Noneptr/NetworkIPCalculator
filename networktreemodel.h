@@ -95,6 +95,10 @@ signals:
                                                                                               // раскрыть элемент с указанным индексом
 
     void fileReaded();                                                                        // сигнализирует о том, что файл прочитан
+    void fileWrited();                                                                        // сигнализирует о том, что файл записан
+    void fileReadActive();                                                                    // сигнал, файл считывается
+    void fileWriteActive();                                                                   // сигнал, файл записывается
+    void expandAllExistActive();                                                              // сигнал, раскрытие модели
     void makedBusyNodes();                                                                    // сигнал о том, что подсети сделаны
     void notMakedBusyNodes(const QVector<unsigned int> &);                                    // сигнал о том, какие подсети не могут быть сделаны
     void searchIsActive();                                                                    // сигнал о том, что идёт поиск

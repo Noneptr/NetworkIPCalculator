@@ -60,7 +60,7 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
     QStandardItem *parent = invisibleRootItem();
     if (parent->rowCount() == 0)
     {
-        createNetworkItem(parent, net_info);
+        createNetworkRoot(net_info);
     }
     else
     {
@@ -152,6 +152,8 @@ void NetworkTreeModel::expandAllExist()
         QStandardItem *curr;
         while(!nodes.empty())                                           // обход дерева в ширину
         {
+            emit expandAllExistActive();
+
             curr = nodes.front();
             nodes.pop();
 
@@ -391,6 +393,8 @@ void NetworkTreeModel::writeNetworkInFile()
             QStandardItem *curr;
             while(!nodes.empty())                                                // обход дерева в ширину
             {
+                emit fileWriteActive();
+
                 curr = nodes.front();
                 nodes.pop();
 
@@ -408,6 +412,8 @@ void NetworkTreeModel::writeNetworkInFile()
             }
         }
         fclose(file);
+
+        emit fileWrited();                                                      // файл записан
     }
     else
     {
@@ -426,6 +432,7 @@ void NetworkTreeModel::readNetworkOfFile()
         NetworkInfo net_info;
         while (fread(&net_info, sizeof(net_info), 1, file) == 1)        // чтение информации об узле из файла
         {
+            emit fileReadActive();
             insertIntoNetwork(net_info);                                // вставка узла в дерево
         }
 

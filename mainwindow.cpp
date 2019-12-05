@@ -14,7 +14,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(model, SIGNAL(needExpandItem(const QModelIndex &)), ui->treeView, SLOT(expand(const QModelIndex &)));
     connect(ui->treeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(setBusyNode(const QModelIndex &)));
     connect(model, SIGNAL(searchIsActive()), this, SLOT(displayStatusSearch()));
-    connect(model, SIGNAL(notMakedBusyNodes(const QVector<unsigned int> &)), this, SLOT(displayStatusMakedBusyNodes(const QVector<unsigned int> &)));                                                                         // реакция на не выделенные подсети
+    connect(model, SIGNAL(notMakedBusyNodes(const QVector<unsigned int> &)), this, SLOT(displayStatusMakedBusyNodes(const QVector<unsigned int> &)));
+    connect(model, SIGNAL(fileReadActive()), this, SLOT(displayStatusFileReadActive()));
+    connect(model, SIGNAL(fileWriteActive()), this, SLOT(displayStatusFileWriteActive()));
+    connect(model, SIGNAL(expandAllExistActive()), this, SLOT(displayStatusModelExpanded()));
 
 //    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
 
@@ -159,6 +162,27 @@ void MainWindow::displayStatusMakedBusyNodes(const QVector<unsigned int> &vals)
     ui->statusbar->showMessage(text, 3000);
 }
 
+
+void MainWindow::displayStatusFileReadActive()
+{
+    ui->statusbar->setStyleSheet(color_message);
+    ui->statusbar->showMessage("Открытие...", 1000);
+}
+
+void MainWindow::displayStatusFileWriteActive()
+{
+    ui->statusbar->setStyleSheet(color_message);
+    ui->statusbar->showMessage("Сохранение...", 1000);
+}
+
+
+void MainWindow::displayStatusModelExpanded()
+{
+    ui->statusbar->setStyleSheet(color_message);
+    ui->statusbar->showMessage("Идёт обработка...", 1000);
+}
+
+
 void MainWindow::on_action_clear_tree_triggered()
 {
     model->clear();
@@ -226,7 +250,18 @@ void MainWindow::on_action_open_triggered()
     model->setFilename(filenameO);
     if (model->filename() != "")
     {
-        model->readNetworkOfFile();
+        try
+        {
+            model->readNetworkOfFile();
+        }
+        catch (NetworkTreeModelError &error)
+        {
+            if (error == __ERROR_READ_OF_BIN_FILE__)
+            {
+                ui->statusbar->setStyleSheet(color_error);
+                ui->statusbar->showMessage("Ошибка открытия файла!!!", 2500);
+            }
+        }
     }
 }
 
@@ -247,6 +282,17 @@ void MainWindow::on_action_save_triggered()
 
     if (model->filename() != "")
     {
-        model->writeNetworkInFile();
+        try
+        {
+            model->writeNetworkInFile();
+        }
+        catch (NetworkTreeModelError &error)
+        {
+            if (error == __ERROR_WRITE_IN_BIN_FILE__)
+            {
+                ui->statusbar->setStyleSheet(color_error);
+                ui->statusbar->showMessage("Ошибка сохранения файла!!!", 2500);
+            }
+        }
     }
 }

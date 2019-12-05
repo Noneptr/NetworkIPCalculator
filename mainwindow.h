@@ -35,6 +35,12 @@ private slots:
 
     void displayStatusMakedBusyNodes(const QVector<unsigned int> &vals);
 
+    void displayStatusFileReadActive();
+
+    void displayStatusFileWriteActive();
+
+    void displayStatusModelExpanded();
+
     void on_action_create_triggered();
 
     void on_action_search_triggered();
