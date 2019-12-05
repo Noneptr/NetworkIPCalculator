@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->treeView, SIGNAL(expanded(const QModelIndex &)), model, SLOT(splitNetworkItem(const QModelIndex &)));
     connect(ui->treeView, SIGNAL(collapsed(const QModelIndex &)), model, SLOT(mergeNetworkItem(const QModelIndex &)));
     connect(model, SIGNAL(needExpandItem(const QModelIndex &)), ui->treeView, SLOT(expand(const QModelIndex &)));
+    connect(ui->treeView, &NetworkTreeView::doubleClicked, this, &MainWindow::setBusyNode);         // реакция на попытку редактировать узел
+
     connect(model, &NetworkTreeModel::notMakedBusyNodes,
             [](const QVector<unsigned int> &v)
     {
@@ -22,33 +24,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         qDebug() << "}";
     });                                                                         // реакция на не выделенные подсети
-
-    connect(ui->treeView, &NetworkTreeView::doubleClicked,
-            [&](const QModelIndex &index)
-    {
-        QStandardItem *parent = static_cast<QStandardItem*>(index.internalPointer());
-        QString data = parent->child(index.row())->text();
-        for(QString &s : data.split("\n"))
-        {
-            qDebug() << s;
-        }
-        qDebug() << endl;
-
-        NetInputDialog dialog("Введите количество занятых: ", "Изменить", "Отмена", this);
-
-        if (dialog.exec() == QDialog::Accepted)
-        {
-            try
-            {
-                model->userMakeBusyNode(index, 14);
-            }
-            catch (NetworkTreeModelError &error)
-            {
-                if (error == __ERROR_USER_MAKE_BUSY_NODE__)
-                qDebug() << "No maked!!!" << endl;
-            }
-        }
-    });                                                                         // реакция на попытку редактировать узел
 
     model->setHorizontalHeaderLabels({QString("")});
     model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
@@ -66,6 +41,33 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+void MainWindow::setBusyNode(const QModelIndex index)
+{
+    QStandardItem *parent = static_cast<QStandardItem*>(index.internalPointer());
+    QString data = parent->child(index.row())->text();
+    for(QString &s : data.split("\n"))
+    {
+        qDebug() << s;
+    }
+    qDebug() << endl;
+
+    NetInputDialog dialog("Введите значение занятых хостов: ", "Изменить", "Отмена", "Занять\\Освободить сеть", this);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        try
+        {
+            model->userMakeBusyNode(index, 14);
+        }
+        catch (NetworkTreeModelError &error)
+        {
+            if (error == __ERROR_USER_MAKE_BUSY_NODE__)
+            qDebug() << "No maked!!!" << endl;
+        }
+    }
 }
 
 

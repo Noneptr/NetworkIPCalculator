@@ -12,9 +12,13 @@
 class NetInputDialog: public QDialog
 {
 private:
-    QLineEdit *__edit;
+    QLabel *label;
+    QLineEdit *lineEdit;
+    QPushButton *okBt;
+    QPushButton *cancelBt;
 public:
-    NetInputDialog(const QString &message, const QString &btOkText, const QString &btCancelText,
+    NetInputDialog(const QString &message, const QString &btOkText,
+                   const QString &btCancelText, const QString &winTitle,
                    QWidget *parent = 0, Qt::WindowFlags f = 0);
 
     QString resultInput() const;
