@@ -14,6 +14,7 @@ QString NetworkTreeModel::__ico_busy_net__ = ":/rec/icons/busy_network.png";
 NetworkTreeModel::NetworkTreeModel(QObject *parent)
     :QStandardItemModel(parent), __filename("new_net_tree")
 {
+    setHorizontalHeaderLabels({QString("")});
     connect(this, SIGNAL(fileReaded()), this, SLOT(expandAllExist()));
     connect(this, SIGNAL(makedBusyNodes()), this, SLOT(expandAllExist()));
 }
@@ -21,6 +22,7 @@ NetworkTreeModel::NetworkTreeModel(QObject *parent)
 NetworkTreeModel::NetworkTreeModel(const QString &filename, QObject *parent)
     :QStandardItemModel(parent), __filename(filename)
 {
+    setHorizontalHeaderLabels({QString("")});
 }
 
 
@@ -189,6 +191,8 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
 
 void NetworkTreeModel::createNetworkRoot(const IPrecord &ip, const NetMask &mask)
 {
+    this->clear();
+    setHorizontalHeaderLabels({QString("")});
     QStandardItem *parentItem = this->invisibleRootItem();
     createNetworkItem(parentItem, NetworkInfo(ip, mask));
 }
@@ -196,6 +200,8 @@ void NetworkTreeModel::createNetworkRoot(const IPrecord &ip, const NetMask &mask
 
 void NetworkTreeModel::createNetworkRoot(const NetworkInfo &net_info)
 {
+    this->clear();
+    setHorizontalHeaderLabels({QString("")});
     QStandardItem *parentItem = this->invisibleRootItem();
     createNetworkItem(parentItem, net_info);
 }
@@ -409,9 +415,6 @@ void NetworkTreeModel::readNetworkOfFile()
     file = fopen((__filename + __file_extention__).toStdString().c_str(), "rb");
     if (file)
     {
-        this->clear();
-        setHorizontalHeaderLabels({QString("")});
-
         NetworkInfo net_info;
         while (fread(&net_info, sizeof(net_info), 1, file) == 1)        // чтение информации об узле из файла
         {

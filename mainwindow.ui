@@ -151,8 +151,14 @@ QTreeView::item:selected:!active {
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_create"/>
+   <addaction name="action_split"/>
+   <addaction name="action_search"/>
   </widget>
   <action name="action_open">
+   <property name="icon">
+    <iconset theme=":/rec/icons/open.png"/>
+   </property>
    <property name="text">
     <string>Открыть...</string>
    </property>
@@ -164,6 +170,9 @@ QTreeView::item:selected:!active {
    </property>
   </action>
   <action name="action_save">
+   <property name="icon">
+    <iconset theme=":/rec/icons/save.png"/>
+   </property>
    <property name="text">
     <string>Сохранить...</string>
    </property>
@@ -186,6 +195,9 @@ QTreeView::item:selected:!active {
    </property>
   </action>
   <action name="action_clear_tree">
+   <property name="icon">
+    <iconset theme=":/rec/icons/clear_tree.png"/>
+   </property>
    <property name="text">
     <string>Отчистить дерево...</string>
    </property>
@@ -194,6 +206,9 @@ QTreeView::item:selected:!active {
    </property>
   </action>
   <action name="action_search">
+   <property name="icon">
+    <iconset theme=":/rec/icons/search.png"/>
+   </property>
    <property name="text">
     <string>Поиск...</string>
    </property>
@@ -205,6 +220,9 @@ QTreeView::item:selected:!active {
    </property>
   </action>
   <action name="action_create">
+   <property name="icon">
+    <iconset theme=":/rec/icons/create.png"/>
+   </property>
    <property name="text">
     <string>Создать новую сеть...</string>
    </property>
@@ -213,6 +231,9 @@ QTreeView::item:selected:!active {
    </property>
   </action>
   <action name="action_split">
+   <property name="icon">
+    <iconset theme=":/rec/icons/split.png"/>
+   </property>
    <property name="text">
     <string>Разделить на подсети...</string>
    </property>
@@ -221,6 +242,9 @@ QTreeView::item:selected:!active {
    </property>
   </action>
   <action name="action_exit">
+   <property name="icon">
+    <iconset theme=":/rec/icons/exit.png"/>
+   </property>
    <property name="text">
     <string>Выход...</string>
    </property>
