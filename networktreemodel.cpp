@@ -339,27 +339,34 @@ void NetworkTreeModel::userMakeBusyNode(const QModelIndex &index, unsigned int b
 void NetworkTreeModel::makeBusyNodes(const QVector<unsigned int> &vals)
 {
     QStandardItem *root = invisibleRootItem()->child(0);
-    QVector<unsigned int> vector = vals;
-    __sort_qvector_helper__::selectUpSortQVector(vector);                       // сортировка полученной последовательности
-    for (unsigned int &e: vector)
+    if (root)
     {
-        makeBusyNode(root, e);
-    }
-
-    emit makedBusyNodes();                                                      // узлы с занятыми хостами сделаны
-
-    QVector<unsigned int> notMakedVector;
-    for (unsigned int e: vector)
-    {
-        if (e != 0)
+        QVector<unsigned int> vector = vals;
+        __sort_qvector_helper__::selectUpSortQVector(vector);                       // сортировка полученной последовательности
+        for (unsigned int &e: vector)
         {
-            notMakedVector.append(e);
+            makeBusyNode(root, e);
+        }
+
+        emit makedBusyNodes();                                                      // узлы с занятыми хостами сделаны
+
+        QVector<unsigned int> notMakedVector;
+        for (unsigned int e: vector)
+        {
+            if (e != 0)
+            {
+                notMakedVector.append(e);
+            }
+        }
+
+        if (notMakedVector.size() > 0)
+        {
+            emit notMakedBusyNodes(notMakedVector);                                     // сигнал говорит о том какие подсети не могут быть добавлены
         }
     }
-
-    if (notMakedVector.size() > 0)
+    else
     {
-        emit notMakedBusyNodes(notMakedVector);                                     // сигнал говорит о том какие подсети не могут быть добавлены
+        throw __ERROR_NETWORK_TREE_IS_EMPTY__;
     }
 }
 
@@ -428,6 +435,47 @@ void NetworkTreeModel::readNetworkOfFile()
     else
     {
         throw __ERROR_READ_OF_BIN_FILE__;
+    }
+}
+
+
+QVector<QModelIndex> NetworkTreeModel::findNodes(const QString &key)
+{
+    QStandardItem *parent = invisibleRootItem();
+    QStandardItem *root = parent->child(0);
+    if (root)
+    {
+        QVector<QModelIndex> find_nodes;
+        std::queue<QStandardItem *> nodes;
+        nodes.push(root);
+        QStandardItem *curr;
+        while(!nodes.empty())                                                // обход дерева в ширину
+        {
+            emit searchIsActive();
+
+            curr = nodes.front();
+            nodes.pop();
+
+            QString data = curr->text();
+            if (data != __emptySign__)
+            {
+                if (data.indexOf(key) != -1)
+                {
+                    find_nodes.append(curr->index());
+                }
+
+                for (int i = 0; i < curr->rowCount(); i++)
+                {
+                    nodes.push(curr->child(i));
+                }
+            }
+        }
+        return find_nodes;
+    }
+    else
+    {
+        throw __ERROR_NETWORK_TREE_IS_EMPTY__;
+        /* поиск в пустом дереве */
     }
 }
 

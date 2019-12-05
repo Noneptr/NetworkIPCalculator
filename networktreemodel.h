@@ -17,7 +17,8 @@
 
 
 enum NetworkTreeModelError {__ERROR_WRITE_IN_BIN_FILE__, __ERROR_READ_OF_BIN_FILE__,
-                           __ERROR_USER_MAKE_BUSY_NODE__};                                  // Исключения вызываемые классом
+                           __ERROR_USER_MAKE_BUSY_NODE__,
+                           __ERROR_NETWORK_TREE_IS_EMPTY__,};                                  // Исключения вызываемые классом
 
 const QString __file_extention__ = ".ipcalc";                                               // расширение бинарного файла с сетевой схемой
 
@@ -85,6 +86,10 @@ public slots:
     void userMakeBusyNode(const QModelIndex &index, unsigned int busy_hosts);                  // пользовательское выделение подсети с занятыми хостами
     //=====================================================================================================================
 
+    //========================== Поиск узла в дереве ======================================================================
+    QVector<QModelIndex> findNodes(const QString &key);
+    //=====================================================================================================================
+
 signals:
     void needExpandItem(const QModelIndex&);                                                  // сигнализирует представлению о необходимости
                                                                                               // раскрыть элемент с указанным индексом
@@ -92,6 +97,7 @@ signals:
     void fileReaded();                                                                        // сигнализирует о том, что файл прочитан
     void makedBusyNodes();                                                                    // сигнал о том, что подсети сделаны
     void notMakedBusyNodes(const QVector<unsigned int> &);                                    // сигнал о том, какие подсети не могут быть сделаны
+    void searchIsActive();                                                                    // сигнал о том, что идёт поиск
 };
 
 #endif // NETWORKTREEMODEL_H

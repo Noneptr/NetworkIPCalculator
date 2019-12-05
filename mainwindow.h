@@ -27,9 +27,21 @@ public:
     ~MainWindow();
 
 private slots:
-    void setBusyNode(const QModelIndex index);                 // установить значение занятости в узле
+    void setBusyNode(const QModelIndex &index);                 // установить значение занятости в узле
+
+    void displayStatusSearch();
+
+    void displayStatusMakedBusyNodes(const QVector<unsigned int> &vals);
 
     void on_action_create_triggered();
+
+    void on_action_search_triggered();
+
+    void on_action_clear_tree_triggered();
+
+    void on_action_split_triggered();
+
+    void on_action_exit_triggered();
 
 private:
     Ui::MainWindow *ui;

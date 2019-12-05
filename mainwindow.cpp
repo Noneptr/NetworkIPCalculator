@@ -12,18 +12,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->treeView, SIGNAL(expanded(const QModelIndex &)), model, SLOT(splitNetworkItem(const QModelIndex &)));
     connect(ui->treeView, SIGNAL(collapsed(const QModelIndex &)), model, SLOT(mergeNetworkItem(const QModelIndex &)));
     connect(model, SIGNAL(needExpandItem(const QModelIndex &)), ui->treeView, SLOT(expand(const QModelIndex &)));
-    connect(ui->treeView, &NetworkTreeView::doubleClicked, this, &MainWindow::setBusyNode);         // реакция на попытку редактировать узел
-
-    connect(model, &NetworkTreeModel::notMakedBusyNodes,
-            [](const QVector<unsigned int> &v)
-    {
-        qDebug() << "{ ";
-        for (unsigned e: v)
-        {
-            qDebug() << e << ";";
-        }
-        qDebug() << "}";
-    });                                                                         // реакция на не выделенные подсети
+    connect(ui->treeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(setBusyNode(const QModelIndex &)));
+    connect(model, SIGNAL(searchIsActive()), this, SLOT(displayStatusSearch()));
+    connect(model, SIGNAL(notMakedBusyNodes(const QVector<unsigned int> &)), this, SLOT(displayStatusMakedBusyNodes(const QVector<unsigned int> &)));                                                                         // реакция на не выделенные подсети
 
 //    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
 
@@ -43,7 +34,7 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::setBusyNode(const QModelIndex index)
+void MainWindow::setBusyNode(const QModelIndex &index)
 {
     NetInputDialog dialog("Введите значение занятых хостов: ", "Изменить", "Отмена", "Занять\\Освободить сеть", this);
 
@@ -106,4 +97,124 @@ void MainWindow::on_action_create_triggered()
             ui->statusbar->showMessage("Ошибка!!! Неверно указан префикс маски!!!", 2500);
         }
     }
+}
+
+void MainWindow::on_action_search_triggered()
+{
+    NetInputDialog dialog("Введите данные поиска: ", "Искать", "Отмена", "Поиск элемента в дереве", this);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        QString key = dialog.resultInput();
+        QVector<QModelIndex> find_indexs;
+        try
+        {
+            find_indexs = model->findNodes(key);
+            if (find_indexs.size() > 0)
+            {
+                ui->treeView->selectionModel()->clear();
+
+                for (const QModelIndex &index: find_indexs)
+                {
+                    ui->treeView->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+                }
+            }
+            else
+            {
+                ui->statusbar->setStyleSheet(color_message);
+                ui->statusbar->showMessage("Элемент не найден!!!", 2500);
+            }
+        }
+        catch (NetworkTreeModelError &error)
+        {
+            if (error == __ERROR_NETWORK_TREE_IS_EMPTY__)
+            {
+                ui->statusbar->setStyleSheet(color_error);
+                ui->statusbar->showMessage("Ошибка!!! Сетевое дерево не создано!!!", 2500);
+            }
+        }
+    }
+}
+
+
+void MainWindow::displayStatusSearch()
+{
+    ui->statusbar->setStyleSheet(color_message);
+    ui->statusbar->showMessage("Поиск...", 1000);
+}
+
+
+void MainWindow::displayStatusMakedBusyNodes(const QVector<unsigned int> &vals)
+{
+    QString text = "Подсети со следующими размерами не могут быть выделены!!! ( ";
+    for (int i = 0; i < vals.size(); i++)
+    {
+        text += QString::number(vals[i]);
+        if (i != vals.size() - 1)
+        {
+            text += ", ";
+        }
+    }
+    text += " )";
+    ui->statusbar->setStyleSheet(color_error);
+    ui->statusbar->showMessage(text, 3000);
+}
+
+void MainWindow::on_action_clear_tree_triggered()
+{
+    model->clear();
+}
+
+void MainWindow::on_action_split_triggered()
+{
+    NetInputDialog dialog("Введите размеры подсетей(через пробел): ", "Разделить", "Отмена", "Разделить на подсети", this);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        QString data = dialog.resultInput();
+        QVector <unsigned int> v;
+        if (data.indexOf(" ") != -1)
+        {
+            QStringList list = data.split(" ");
+            for (QString &e: list)
+            {
+                v.append(e.toUInt());
+            }
+        }
+        else
+        {
+            v.append(data.toUInt());
+        }
+
+        if (v.indexOf(0) == -1)
+        {
+            try
+            {
+                model->makeBusyNodes(v);
+                if (ui->statusbar->currentMessage() == " ")
+                {
+                    ui->statusbar->setStyleSheet(color_message);
+                    ui->statusbar->showMessage("Сеть успешно разбита", 2500);
+                }
+            }
+            catch(NetworkTreeModelError &error)
+            {
+                if (error == __ERROR_NETWORK_TREE_IS_EMPTY__)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Ошибка!!! Сетевое дерево не создано!!!", 2500);
+                }
+            }
+        }
+        else
+        {
+            ui->statusbar->setStyleSheet(color_error);
+            ui->statusbar->showMessage("Некорректное значение размера подсети!!!", 2500);
+        }
+    }
+}
+
+void MainWindow::on_action_exit_triggered()
+{
+    this->close();
 }
