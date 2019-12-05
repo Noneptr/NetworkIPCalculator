@@ -101,7 +101,7 @@ void MainWindow::on_action_create_triggered()
 
 void MainWindow::on_action_search_triggered()
 {
-    NetInputDialog dialog("Введите данные поиска: ", "Искать", "Отмена", "Поиск элемента в дереве", this);
+    NetInputDialog dialog("Введите данные поиска: ", "Искать", "Отмена", "Поиск элемента", this);
 
     if (dialog.exec() == QDialog::Accepted)
     {
@@ -110,10 +110,9 @@ void MainWindow::on_action_search_triggered()
         try
         {
             find_indexs = model->findNodes(key);
+            ui->treeView->selectionModel()->clear();
             if (find_indexs.size() > 0)
             {
-                ui->treeView->selectionModel()->clear();
-
                 for (const QModelIndex &index: find_indexs)
                 {
                     ui->treeView->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
@@ -191,7 +190,7 @@ void MainWindow::on_action_split_triggered()
             try
             {
                 model->makeBusyNodes(v);
-                if (ui->statusbar->currentMessage() == " ")
+                if (ui->statusbar->currentMessage() == "")
                 {
                     ui->statusbar->setStyleSheet(color_message);
                     ui->statusbar->showMessage("Сеть успешно разбита", 2500);
@@ -217,4 +216,37 @@ void MainWindow::on_action_split_triggered()
 void MainWindow::on_action_exit_triggered()
 {
     this->close();
+}
+
+void MainWindow::on_action_open_triggered()
+{
+    QString extention_file = "(*" + __file_extention__ +")";
+    QString filenameO = QFileDialog::getOpenFileName(this, tr("Открыть файл"), "/home/",
+                                                     tr(extention_file.toStdString().c_str()));
+    model->setFilename(filenameO);
+    if (model->filename() != "")
+    {
+        model->readNetworkOfFile();
+    }
+}
+
+void MainWindow::on_action_help_triggered()
+{
+    QMessageBox::information(this, "Справка",\
+    "IP калькулятор - инструмент, помощник для проектирования сетей на сетевом уровне.",\
+                                  QMessageBox::Ok);
+}
+
+void MainWindow::on_action_save_triggered()
+{
+    QString extention_file = "(*" + __file_extention__ +")";
+    QString filenameS = QFileDialog::getSaveFileName(this, tr("Сохранить файл"),\
+                       "/home/my_project", tr(extention_file.toStdString().c_str()));
+
+    model->setFilename(filenameS);
+
+    if (model->filename() != "")
+    {
+        model->writeNetworkInFile();
+    }
 }

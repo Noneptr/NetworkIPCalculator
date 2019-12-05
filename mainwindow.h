@@ -12,6 +12,8 @@
 #include "networktreeview.h"
 #include <queue>
 #include "netinputdialog.h"
+#include <QFileDialog>
+#include <QMessageBox>
 
 
 QT_BEGIN_NAMESPACE
@@ -42,6 +44,12 @@ private slots:
     void on_action_split_triggered();
 
     void on_action_exit_triggered();
+
+    void on_action_open_triggered();
+
+    void on_action_help_triggered();
+
+    void on_action_save_triggered();
 
 private:
     Ui::MainWindow *ui;
