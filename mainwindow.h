@@ -29,12 +29,6 @@ public:
 private slots:
     void setBusyNode(const QModelIndex index);                 // установить значение занятости в узле
 
-    void on_pushButton_clicked();
-
-    void on_pushButton_2_clicked();
-
-    void on_pushButton_3_clicked();
-
 private:
     Ui::MainWindow *ui;
     NetworkTreeModel * model;

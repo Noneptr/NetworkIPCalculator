@@ -46,42 +46,23 @@ MainWindow::~MainWindow()
 
 void MainWindow::setBusyNode(const QModelIndex index)
 {
-    QStandardItem *parent = static_cast<QStandardItem*>(index.internalPointer());
-    QString data = parent->child(index.row())->text();
-    for(QString &s : data.split("\n"))
-    {
-        qDebug() << s;
-    }
-    qDebug() << endl;
-
     NetInputDialog dialog("Введите значение занятых хостов: ", "Изменить", "Отмена", "Занять\\Освободить сеть", this);
 
     if (dialog.exec() == QDialog::Accepted)
     {
         try
         {
-            model->userMakeBusyNode(index, 14);
+            unsigned int count = dialog.resultInput().toUInt();
+            model->userMakeBusyNode(index, count);
+            ui->treeView->collapse(index);
         }
         catch (NetworkTreeModelError &error)
         {
             if (error == __ERROR_USER_MAKE_BUSY_NODE__)
-            qDebug() << "No maked!!!" << endl;
+            {
+                ui->statusbar->setStyleSheet("color: rgba(178, 34, 34);");
+                ui->statusbar->showMessage("Ошибка!!! Введено хостов больше, чем имеется в подсети!!!", 2500);
+            }
         }
     }
-}
-
-
-void MainWindow::on_pushButton_clicked()
-{
-    model->writeNetworkInFile();
-}
-
-void MainWindow::on_pushButton_2_clicked()
-{
-    model->readNetworkOfFile();
-}
-
-void MainWindow::on_pushButton_3_clicked()
-{
-    model->expandAllExist();
 }

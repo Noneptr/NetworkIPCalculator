@@ -5,25 +5,15 @@ NetInputDialog::NetInputDialog(const QString &message, const QString &btOkText,
                                QWidget *parent, Qt::WindowFlags f)
     :QDialog(parent, f)
 {
-    QFont font_label = QFont("MS Shell Dlg 2", 10, 10);
-    QFont font_edit_line = QFont("MS Shell Dlg 2", 10, 9);
-    QFont font_bts = QFont("MS Shell Dlg 2", 10, 7);
-
-
     label = new QLabel(message, this);
-    label->setFont(font_label);
-
     lineEdit = new QLineEdit(this);
     label->setBuddy(lineEdit);
-    lineEdit->setFont(font_edit_line);
 
     okBt = new QPushButton(btOkText);
     okBt->setCursor(QCursor(Qt::CursorShape::PointingHandCursor));
-    okBt->setFont(font_bts);
 
     cancelBt = new QPushButton(btCancelText);
     cancelBt->setCursor(QCursor(Qt::CursorShape::PointingHandCursor));
-    cancelBt->setFont(font_bts);
 
     connect(okBt, SIGNAL(clicked()), this, SLOT(accept()));
     connect(cancelBt, SIGNAL(clicked()), this, SLOT(reject()));

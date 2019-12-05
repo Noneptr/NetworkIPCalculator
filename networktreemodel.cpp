@@ -306,7 +306,21 @@ void NetworkTreeModel::userMakeBusyNode(const QModelIndex &index, unsigned int b
     NetworkInfo net_info = stringToNetInfo(data);
     if (busy_hosts <= net_info.mask().countHosts())
     {
-        changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
+        if (busy_hosts == 0)
+        {
+            net_info.setBusyHosts(busy_hosts);
+            netItem->setText(netInfoToString(net_info));
+            netItem->removeRows(0, netItem->rowCount());
+            netItem->appendRow(new QStandardItem(__emptySign__));
+
+            //================== Отчистка иконки ===================================================
+            netItem->setIcon(QIcon());
+            //=======================================================================================
+        }
+        else
+        {
+            changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
+        }
     }
     else
     {
