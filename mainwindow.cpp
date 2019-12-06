@@ -23,14 +23,25 @@ MainWindow::MainWindow(QWidget *parent)
     connect(model, &NetworkTreeModel::fileReaded, [&]{ui->statusbar->setStyleSheet(color_message);
                                                       ui->statusbar->showMessage("Файл успешно открыт...", 3000);});
 
-//    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
-
     ui->treeView->setModel(model);
     ui->treeView->setIndentation(75);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование содержимого узлов дерева
 
 //    QVector<unsigned int> v = {60, 30, 8, 12, 18};
 //    model->makeBusyNodes(v);
+    model->createNetworkRoot(NetworkInfo(IPrecord(10, 252, 0, 0), NetMask(14)));
+
+    model->insertIntoNetwork(NetworkInfo(IPrecord(10, 252, 0, 0), NetMask(15)));
+    model->insertIntoNetwork(NetworkInfo(IPrecord(10, 254, 0, 0), NetMask(15)));
+
+    model->insertIntoNetwork(NetworkInfo(IPrecord(10, 254, 0, 0), NetMask(16)));
+    model->insertIntoNetwork(NetworkInfo(IPrecord(10, 255, 0, 0), NetMask(16)));
+
+    NetworkInfo net_info = NetworkInfo(IPrecord(10, 255, 0, 0), NetMask(17));
+    model->insertIntoNetwork(net_info);
+    NetworkInfo net_info2 = NetworkInfo(net_info.directBroadcast() + 1, NetMask(17));
+    model->insertIntoNetwork(net_info2);
+    model->expandAllExist();
 }
 
 
