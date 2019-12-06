@@ -45,9 +45,8 @@ public:
     IPrecord operator - (const IPrecord &obj) const;
     IPrecord operator + (const IPrecord &obj) const;
 
-    IPrecord operator + (unsigned short val) const;
-    IPrecord operator - (unsigned short val) const;
-    IPrecord operator / (unsigned short val) const;
+    IPrecord operator + (unsigned int val) const;
+    IPrecord operator - (unsigned int val) const;
 
     bool operator == (const IPrecord &obj) const;
     bool operator < (const IPrecord &obj) const;
@@ -55,7 +54,10 @@ public:
     bool operator <= (const IPrecord &obj) const;
     bool operator >= (const IPrecord &obj) const;
 
-    friend IPrecord operator + (unsigned short val, const IPrecord &obj);
+    static unsigned int IPrecordToUInt(const IPrecord &rec);
+    static IPrecord uintToIPrecord(unsigned int val);
+
+    friend IPrecord operator + (unsigned int val, const IPrecord &obj);
     // ==================================================================================
 };
 

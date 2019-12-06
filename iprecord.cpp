@@ -208,42 +208,21 @@ IPrecord IPrecord::operator + (const IPrecord &obj) const
 }
 
 
-IPrecord IPrecord::operator + (unsigned short val) const
+IPrecord IPrecord::operator + (unsigned int val) const
 {
-    IPrecord res;
-    unsigned short vfour = this->fourOctet() + val;
-    res.setFourOctet(vfour % 256);
-    unsigned short vthree = this->threeOctet() + vfour / 256;
-    res.setThreeOctet(vthree % 256);
-    unsigned short vtwo = this->twoOctet() + vthree / 256;
-    res.setTwoOctet(vtwo % 256);
-    unsigned short vone = this->oneOctet() + vtwo / 256;
-    res.setOneOctet(vone % 256);
-    return res;
+    return uintToIPrecord(this->toUInt() + val);
 }
 
 
-IPrecord operator + (unsigned short val, const IPrecord &obj)
+IPrecord operator + (unsigned int val, const IPrecord &obj)
 {
     return obj + val;
 }
 
 
-IPrecord IPrecord::operator - (unsigned short val) const
+IPrecord IPrecord::operator - (unsigned int val) const
 {
-    IPrecord res;
-    short vfour = static_cast<short>(this->fourOctet() - val);
-    res.setFourOctet(vfour < 0? 256 - (abs(vfour) % 256): static_cast<unsigned short>(vfour));
-    short vthree = this->threeOctet() + vfour/ 256;
-    vthree = vfour < 0? vthree - 1: vthree;
-    res.setThreeOctet(vthree < 0? 256 - (abs(vthree) % 256): static_cast<unsigned short>(vthree));
-    short vtwo = this->twoOctet() + vthree/ 256;
-    vtwo = vthree < 0? vtwo - 1: vtwo;
-    res.setTwoOctet(vtwo < 0? 256 - (abs(vtwo) % 256): static_cast<unsigned short>(vtwo));
-    short vone = this->oneOctet() + vtwo/ 256;
-    vone = vtwo < 0? vone - 1: vone;
-    res.setOneOctet(vone < 0? 256 - (abs(vone) % 256): static_cast<unsigned short>(vone));
-    return res;
+    return uintToIPrecord(this->toUInt() - val);
 }
 
 
@@ -279,17 +258,9 @@ bool IPrecord::operator >= (const IPrecord &obj) const
 }
 
 
-IPrecord IPrecord::operator / (unsigned short val) const
-{
-    return IPrecord(__one_oct / val, __two_oct / val, __three_oct / val, __four_oct / val);
-}
-
-
 unsigned int IPrecord::toUInt() const
 {
-    return __one_oct * static_cast<unsigned int>(std::pow(256, 3)) +
-           __two_oct * static_cast<unsigned int>(std::pow(256, 2)) +
-           __three_oct * 256 + __four_oct;
+    return IPrecordToUInt(*this);
 }
 
 
@@ -299,4 +270,26 @@ QString IPrecord::toQString() const
             + QString::number(__two_oct) + "."
             + QString::number(__three_oct) + "."
             + QString::number(__four_oct);
+}
+
+
+unsigned int IPrecord::IPrecordToUInt(const IPrecord &rec)
+{
+    return rec.oneOctet() * static_cast<unsigned int>(std::pow(256, 3)) +
+            rec.twoOctet() * static_cast<unsigned int>(std::pow(256, 2)) +
+            rec.threeOctet() * 256 + rec.fourOctet();
+}
+
+
+IPrecord IPrecord::uintToIPrecord(unsigned int val)
+{
+    IPrecord result;
+    result.setFourOctet(val % 256);
+    val /= 256;
+    result.setThreeOctet(val % 256);
+    val /= 256;
+    result.setTwoOctet(val % 256);
+    val /= 256;
+    result.setOneOctet(val % 256);
+    return result;
 }

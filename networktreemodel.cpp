@@ -68,20 +68,12 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
     {
         QStandardItem *root = parent->child(0);
         QStandardItem *curr = root;
-        qDebug() << "==================================START INSERT==================================================";
         while (true)
         {
-            //===========================================================================================================
-            qDebug() << "insert: " << net_info.network().toQString() << "/" << net_info.mask().countBits();
-            qDebug() << "him brod:" << net_info.directBroadcast().toQString();
             NetworkInfo curr_info = stringToNetInfo(curr->text());          // получение сетевых данных о текущем узле
-            qDebug() << "net: " << curr_info.network().toQString() << "/" << curr_info.mask().countBits();
-            qDebug() << "brod: " << curr_info.directBroadcast().toQString();
 
-            IPrecord mid_host = curr_info.directBroadcast() - curr_info.wildcard() / 2;
+            IPrecord mid_host = IPrecord::uintToIPrecord(curr_info.directBroadcast().toUInt() - curr_info.wildcard().toUInt() / 2);
 
-            qDebug() << "mid: " << mid_host.toQString();
-            //===========================================================================================================
             if (net_info.directBroadcast() < mid_host)                      // если меньше среднего адреса сети узла
             {
                 if (curr->rowCount() == 1)
@@ -93,13 +85,6 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
                         if (child_info.directBroadcast() < mid_host)        // если позиция левого занята
                         {
                             curr = curr->child(0);                          // то спускаемся к нему
-                            //============================================================================
-                            NetworkInfo to_left_info = stringToNetInfo(curr->text());
-                            qDebug() << "left to: "
-                                     << to_left_info.network().toQString() << "/"
-                                     << to_left_info.mask().countBits();
-                            qDebug() << endl;
-                            //============================================================================
                             continue;
                         }
                     }
@@ -113,30 +98,11 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
                     {
                         curr->sortChildren(0);                              // восстановление структуры сыновей, путём перестановки их местами
                     }
-                    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-                    //============================================================================
-                    for (int i = 0; i < curr->rowCount(); i++)
-                    {
-                        NetworkInfo rebionok_inf = stringToNetInfo(curr->child(i)->text());
-                        qDebug() << "rebionok" << i << ":"
-                                 << rebionok_inf.network().toQString() << "/"
-                                 << rebionok_inf.mask().countBits();
-                    }
-                    qDebug() << endl;
-                    //============================================================================
-                    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
                     break;
                 }
                 else if (curr->rowCount() == 2)
                 {
                     curr = curr->child(0);                                  // спуститься к левому сыну
-                    //============================================================================
-                    NetworkInfo to_left_info = stringToNetInfo(curr->text());
-                    qDebug() << "left to: "
-                             << to_left_info.network().toQString() << "/"
-                             << to_left_info.mask().countBits();
-                    qDebug() << endl;
-                    //============================================================================
                     continue;
                 }
                 else
@@ -155,13 +121,6 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
                         if (child_info.directBroadcast() >= mid_host)       // если позиция правого занята
                         {
                             curr = curr->child(0);                          // то спускаемся к нему
-                            //============================================================================
-                            NetworkInfo to_right_info = stringToNetInfo(curr->text());
-                            qDebug() << "right to: "
-                                     << to_right_info.network().toQString() << "/"
-                                     << to_right_info.mask().countBits();
-                            qDebug() << endl;
-                            //============================================================================
                             continue;
                         }
                     }
@@ -171,30 +130,11 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
                     {
                         curr->removeRow(0);                                  // удаление пустого символа
                     }
-                    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-                    //============================================================================
-                    for (int i = 0; i < curr->rowCount(); i++)
-                    {
-                        NetworkInfo rebionok_inf = stringToNetInfo(curr->child(i)->text());
-                        qDebug() << "rebionok" << i << ":"
-                                 << rebionok_inf.network().toQString() << "/"
-                                 << rebionok_inf.mask().countBits();
-                    }
-                    qDebug() << endl;
-                    //============================================================================
-                    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
                     break;
                 }
                 else if (curr->rowCount() == 2)
                 {
                     curr = curr->child(1);                                  // спуститься к правому сыну
-                    //============================================================================
-                    NetworkInfo to_right_info = stringToNetInfo(curr->text());
-                    qDebug() << "right to: "
-                             << to_right_info.network().toQString() << "/"
-                             << to_right_info.mask().countBits();
-                    qDebug() << endl;
-                    //============================================================================
                     continue;
                 }
                 else
@@ -203,7 +143,6 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
                 }
             }
         }
-        qDebug() << "==================================END INSERT==================================================";
     }
 }
 
