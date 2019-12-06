@@ -23,6 +23,8 @@ NetworkTreeModel::NetworkTreeModel(const QString &filename, QObject *parent)
     :QStandardItemModel(parent), __filename(filename)
 {
     setHorizontalHeaderLabels({QString("")});
+    connect(this, SIGNAL(fileReaded()), this, SLOT(expandAllExist()));
+    connect(this, SIGNAL(makedBusyNodes()), this, SLOT(expandAllExist()));
 }
 
 
@@ -68,8 +70,13 @@ void NetworkTreeModel::insertIntoNetwork(const NetworkInfo &net_info)
         QStandardItem *curr = root;
         while (true)
         {
+            //===========================================================================================================
             NetworkInfo curr_info = stringToNetInfo(curr->text());          // получение сетевых данных о текущем узле
+            qDebug() << "net: " << curr_info.network().toQString() + "/" + QString::number(curr_info.mask().countBits());
+            qDebug() << "brod: " << curr_info.directBroadcast().toQString();
             IPrecord mid_host = curr_info.directBroadcast() - curr_info.wildcard() / 2;
+            qDebug() << "mid: " << mid_host.toQString() << endl;
+            //===========================================================================================================
             if (net_info.directBroadcast() < mid_host)                      // если меньше среднего адреса сети узла
             {
                 if (curr->rowCount() == 1)
@@ -393,7 +400,7 @@ void NetworkTreeModel::writeNetworkInFile()
             QStandardItem *curr;
             while(!nodes.empty())                                                // обход дерева в ширину
             {
-                emit fileWriteActive();
+//                emit fileWriteActive();
 
                 curr = nodes.front();
                 nodes.pop();
@@ -432,7 +439,7 @@ void NetworkTreeModel::readNetworkOfFile()
         NetworkInfo net_info;
         while (fread(&net_info, sizeof(net_info), 1, file) == 1)        // чтение информации об узле из файла
         {
-            emit fileReadActive();
+//            emit fileReadActive();
             insertIntoNetwork(net_info);                                // вставка узла в дерево
         }
 

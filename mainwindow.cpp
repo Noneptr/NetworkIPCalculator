@@ -18,6 +18,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(model, SIGNAL(fileReadActive()), this, SLOT(displayStatusFileReadActive()));
     connect(model, SIGNAL(fileWriteActive()), this, SLOT(displayStatusFileWriteActive()));
     connect(model, SIGNAL(expandAllExistActive()), this, SLOT(displayStatusModelExpanded()));
+    connect(model, &NetworkTreeModel::fileWrited, [&]{ui->statusbar->setStyleSheet(color_message);
+                                                      ui->statusbar->showMessage("Файл успешно сохранён...", 3000);});
+    connect(model, &NetworkTreeModel::fileReaded, [&]{ui->statusbar->setStyleSheet(color_message);
+                                                      ui->statusbar->showMessage("Файл успешно открыт...", 3000);});
 
 //    model->createNetworkRoot(IPrecord(192, 168, 0, 0), NetMask(24));
 
@@ -26,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование содержимого узлов дерева
 
 //    QVector<unsigned int> v = {60, 30, 8, 12, 18};
-////    QVector<unsigned int> v = {62, 62, 62, 30, 2, 2, 3};
 //    model->makeBusyNodes(v);
 }
 
