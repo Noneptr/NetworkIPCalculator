@@ -180,10 +180,14 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
 
     QStandardItem *node = new QStandardItem(data);
 
-    NetMask subMask = NetMask(net_info.mask().countBits() + 1);
-    if ((subMask.countHosts() >= 2) && (net_info.busyHosts() == 0))                     // проверка на то что может ли существовать следующий узел
+    unsigned short bits = net_info.mask().countBits() + 1;
+    if (bits < 32)
     {
-        node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
+        NetMask subMask = NetMask(bits);
+        if ((subMask.countHosts() >= 2) && (net_info.busyHosts() == 0))                     // проверка на то что может ли существовать следующий узел
+        {
+            node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
+        }
     }
 
     parent->appendRow(node);
@@ -473,7 +477,7 @@ QVector<QModelIndex> NetworkTreeModel::findNodes(const QString &key)
             QString data = curr->text();
             if (data != __emptySign__)
             {
-                if (data.indexOf(key) != -1)
+                if (data.toLower().indexOf(key.toLower()) != -1)
                 {
                     find_nodes.append(curr->index());
                 }

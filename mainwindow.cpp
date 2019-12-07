@@ -13,22 +13,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->treeView, SIGNAL(collapsed(const QModelIndex &)), model, SLOT(mergeNetworkItem(const QModelIndex &)));
     connect(model, SIGNAL(needExpandItem(const QModelIndex &)), ui->treeView, SLOT(expand(const QModelIndex &)));
     connect(ui->treeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(setBusyNode(const QModelIndex &)));
-    connect(model, SIGNAL(searchIsActive()), this, SLOT(displayStatusSearch()));
     connect(model, SIGNAL(notMakedBusyNodes(const QVector<unsigned int> &)), this, SLOT(displayStatusMakedBusyNodes(const QVector<unsigned int> &)));
-    connect(model, SIGNAL(fileReadActive()), this, SLOT(displayStatusFileReadActive()));
-    connect(model, SIGNAL(fileWriteActive()), this, SLOT(displayStatusFileWriteActive()));
-    connect(model, SIGNAL(expandAllExistActive()), this, SLOT(displayStatusModelExpanded()));
     connect(model, &NetworkTreeModel::fileWrited, [&]{ui->statusbar->setStyleSheet(color_message);
                                                       ui->statusbar->showMessage("Файл успешно сохранён...", 3000);});
     connect(model, &NetworkTreeModel::fileReaded, [&]{ui->statusbar->setStyleSheet(color_message);
                                                       ui->statusbar->showMessage("Файл успешно открыт...", 3000);});
+//    connect(model, SIGNAL(searchIsActive()), this, SLOT(displayStatusSearch()));
+//    connect(model, SIGNAL(fileReadActive()), this, SLOT(displayStatusFileReadActive()));
+//    connect(model, SIGNAL(fileWriteActive()), this, SLOT(displayStatusFileWriteActive()));
+//    connect(model, SIGNAL(expandAllExistActive()), this, SLOT(displayStatusModelExpanded()));
 
     ui->treeView->setModel(model);
     ui->treeView->setIndentation(75);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование содержимого узлов дерева
-
-//    QVector<unsigned int> v = {60, 30, 8, 12, 18};
-//    model->makeBusyNodes(v);
 }
 
 
@@ -85,7 +82,7 @@ void MainWindow::on_action_create_triggered()
                     if (err_mask == InvalidCountBitsError)
                     {
                         ui->statusbar->setStyleSheet(color_error);
-                        ui->statusbar->showMessage("Ошибка!!! Некорректный маска подсети!!!", 2500);
+                        ui->statusbar->showMessage("Ошибка!!! Некорректная маска подсети!!!", 2500);
                     }
                 }
             }
@@ -121,6 +118,8 @@ void MainWindow::on_action_search_triggered()
                 {
                     ui->treeView->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
                 }
+                ui->statusbar->setStyleSheet(color_message);
+                ui->statusbar->showMessage("Поиск завершён...", 2500);
             }
             else
             {
