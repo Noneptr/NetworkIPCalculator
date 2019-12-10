@@ -24,6 +24,7 @@ SOURCES += \
     networkinfo.cpp \
     networktreemodel.cpp \
     networktreeview.cpp \
+    rfcs_stds.cpp \
     sort_qvector_helper.cpp
 
 HEADERS += \
@@ -34,6 +35,7 @@ HEADERS += \
     networkinfo.h \
     networktreemodel.h \
     networktreeview.h \
+    rfcs_stds.h \
     sort_qvector_helper.h
 
 FORMS += \

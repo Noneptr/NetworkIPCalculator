@@ -3,15 +3,13 @@
 
 #include <QMainWindow>
 #include <QDebug>
-#include "iprecord.h"
-#include "netmask.h"
 #include <QAbstractItemView>
-#include "networkinfo.h"
 #include "networktreemodel.h"
 #include "networktreeview.h"
 #include "netinputdialog.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include "rfcs_stds.h"
 
 
 QT_BEGIN_NAMESPACE
