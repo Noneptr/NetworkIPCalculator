@@ -4,8 +4,6 @@
 #include <QStandardItemModel>
 #include "networkinfo.h"
 #include <queue>
-#include <cmath>
-#include <QDebug>
 #include "sort_qvector_helper.h"
 
 /* Класс представляет

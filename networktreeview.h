@@ -3,7 +3,6 @@
 
 
 #include <QTreeView>
-#include <QDebug>
 
 class NetworkTreeView: public QTreeView
 {

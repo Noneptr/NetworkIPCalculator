@@ -26,6 +26,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setModel(model);
     ui->treeView->setIndentation(75);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование содержимого узлов дерева
+
+    IPrecord net = IPrecord(240, 0, 0, 0);
+    NetMask mask = NetMask(4);
+    qDebug() << net.toQString() << endl;
+    qDebug() << mask.mask().toQString() << endl;
+    qDebug() << (mask.mask() + mask.countHosts() + 1).toQString() << endl;
 }
 
 
