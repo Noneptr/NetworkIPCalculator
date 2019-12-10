@@ -80,28 +80,49 @@ void MainWindow::on_action_create_triggered()
                 unsigned short bits = list[1].toUShort();
                 try
                 {
-                    NetMask mask(bits);
-                    model->createNetworkRoot(adress, mask);
+                    if (bits > 0 && bits <= 30)
+                    {
+                        NetMask mask(bits);
+
+                        IPrecord net_address = adress & mask.mask();
+
+                        if (((net_address >= RFC_5737[0]) && (net_address <= RFC_5737[0] + RFC_5737_m.countHosts() + 1)) ||
+                            ((net_address >= RFC_5737[1]) && (net_address <= RFC_5737[1] + RFC_5737_m.countHosts() + 1)) ||
+                            ((net_address >= RFC_5737[2]) && (net_address <= RFC_5737[2] + RFC_5737_m.countHosts() + 1)))
+                        {
+                            ui->statusbar->setStyleSheet(color_error);
+                            ui->statusbar->showMessage("Согласно RFC5737 192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24 зарезервированы!!!", 4000);
+                        }
+                        else
+                        {
+                            model->createNetworkRoot(adress, mask);
+                        }
+                    }
+                    else
+                    {
+                        ui->statusbar->setStyleSheet(color_error);
+                        ui->statusbar->showMessage("Некорректная маска корня дерева!!! Необходимо: 0 < mask < 31", 2500);
+                    }
                 }
                 catch(NetMaskError &err_mask)
                 {
                     if (err_mask == InvalidCountBitsError)
                     {
                         ui->statusbar->setStyleSheet(color_error);
-                        ui->statusbar->showMessage("Ошибка!!! Некорректная маска подсети!!!", 2500);
+                        ui->statusbar->showMessage("Некорректная маска подсети!!!", 2500);
                     }
                 }
             }
             catch(IPrecordError &err_adress)
             {
                 ui->statusbar->setStyleSheet(color_error);
-                ui->statusbar->showMessage("Ошибка!!! Некорректный IP адрес!!!", 2500);
+                ui->statusbar->showMessage("Некорректный IP адрес!!!", 2500);
             }
         }
         else
         {
             ui->statusbar->setStyleSheet(color_error);
-            ui->statusbar->showMessage("Ошибка!!! Неверно указан префикс маски!!!", 2500);
+            ui->statusbar->showMessage("Неверно указан префикс маски!!!", 2500);
         }
     }
 }
@@ -138,7 +159,7 @@ void MainWindow::on_action_search_triggered()
             if (error == __ERROR_NETWORK_TREE_IS_EMPTY__)
             {
                 ui->statusbar->setStyleSheet(color_error);
-                ui->statusbar->showMessage("Ошибка!!! Сетевое дерево не создано!!!", 2500);
+                ui->statusbar->showMessage("Сетевое дерево не создано!!!", 2500);
             }
         }
     }
@@ -231,7 +252,7 @@ void MainWindow::on_action_split_triggered()
                 if (error == __ERROR_NETWORK_TREE_IS_EMPTY__)
                 {
                     ui->statusbar->setStyleSheet(color_error);
-                    ui->statusbar->showMessage("Ошибка!!! Сетевое дерево не создано!!!", 2500);
+                    ui->statusbar->showMessage("Сетевое дерево не создано!!!", 2500);
                 }
             }
         }
