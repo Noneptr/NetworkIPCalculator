@@ -155,13 +155,19 @@ namespace __check_rfc__
 //    NetMask RFC_8190_m = NetMask(32);
 //===========================================================================================================
 
-    bool check_rfc5737(const IPrecord &net_address);
-    bool check_rfc1918(const IPrecord &net_address);
-    bool check_rfc3068(const IPrecord &net_address);
-    bool check_rfc3927(const IPrecord &net_address);
-    bool check_rfc1122(const IPrecord &net_address);
-    bool check_rfc2544(const IPrecord &net_address);
-    bool check_rfc3171(const IPrecord &net_address);
+    enum RFC_ERROR {RFC_5737_ERROR, RFC_1918_ERROR, RFC_3068_ERROR, RFC_3927_ERROR, RFC_1122_ERROR, RFC_2544_ERROR, RFC_3171_ERROR};
+
+    bool check_line(const IPrecord &rfc, unsigned short rfc_b, const IPrecord &net_address, unsigned short bits);
+    bool check_block(const QVector<IPrecord> &rfc, const QVector<unsigned short> &rfc_bs,
+                     const IPrecord &net_address, unsigned short bits);
+
+    bool check_rfc5737(const IPrecord &net_address, unsigned short bits);
+    bool check_rfc1918(const IPrecord &net_address, unsigned short bits);
+    bool check_rfc3068(const IPrecord &net_address, unsigned short bits);
+    bool check_rfc3927(const IPrecord &net_address, unsigned short bits);
+    bool check_rfc1122(const IPrecord &net_address, unsigned short bits);
+    bool check_rfc2544(const IPrecord &net_address, unsigned short bits);
+    bool check_rfc3171(const IPrecord &net_address, unsigned short bits);
 }
 
 #endif // RFCS_STDS_H

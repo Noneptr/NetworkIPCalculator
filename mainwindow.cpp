@@ -43,9 +43,45 @@ void MainWindow::setBusyNode(const QModelIndex &index)
     {
         try
         {
-            unsigned int count = dialog.resultInput().toUInt();
-            model->userMakeBusyNode(index, count);
-            ui->treeView->collapse(index);
+            try
+            {
+                unsigned int count = dialog.resultInput().toUInt();
+                model->userMakeBusyNode(index, count);
+                ui->treeView->collapse(index);
+            }
+            catch(__check_rfc__::RFC_ERROR &error)
+            {
+                if (error == __check_rfc__::RFC_5737_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC5737 192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24 зарезервированы!!!", 4000);
+                }
+                else if (error == __check_rfc__::RFC_1122_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC1122 0.0.0.0/8, 127.0.0.0/8, 240.0.0.0/4, 255.255.255.255/32 зарезервированы!!!", 4000);
+                }
+                else if (error == __check_rfc__::RFC_2544_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC2544 198.18.0.0/15 зарезервирован!!!", 4000);
+                }
+                else if (error == __check_rfc__::RFC_3068_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC3068 192.88.99.0/24 зарезервирован!!!", 4000);
+                }
+                else if (error == __check_rfc__::RFC_3171_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC3171 224.0.0.0/4 зарезервирован!!!", 4000);
+                }
+                else if (error == __check_rfc__::RFC_3927_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC3927 169.254.0.0/16 зарезервирован!!!", 4000);
+                }
+            }
         }
         catch (NetworkTreeModelError &error)
         {
@@ -80,37 +116,32 @@ void MainWindow::on_action_create_triggered()
 
                         IPrecord net_address = adress & mask.mask();
 
-                        if (__check_rfc__::check_rfc5737(net_address))
+                        if (__check_rfc__::check_rfc5737(net_address, bits))
                         {
                             ui->statusbar->setStyleSheet(color_error);
                             ui->statusbar->showMessage("Согласно RFC5737 192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24 зарезервированы!!!", 4000);
                         }
-                        else if (__check_rfc__::check_rfc1918(net_address))
-                        {
-                            ui->statusbar->setStyleSheet(color_error);
-                            ui->statusbar->showMessage("Согласно RFC1918 10.0.0.0/8, 172.16.0.0/12,  192.168.0.0/16 зарезервированы!!!", 4000);
-                        }
-                        else if (__check_rfc__::check_rfc3068(net_address))
+                        else if (__check_rfc__::check_rfc3068(net_address, bits))
                         {
                             ui->statusbar->setStyleSheet(color_error);
                             ui->statusbar->showMessage("Согласно RFC3068 192.88.99.0/24 зарезервирован!!!", 4000);
                         }
-                        else if (__check_rfc__::check_rfc3927(net_address))
+                        else if (__check_rfc__::check_rfc3927(net_address, bits))
                         {
                             ui->statusbar->setStyleSheet(color_error);
                             ui->statusbar->showMessage("Согласно RFC3927 169.254.0.0/16 зарезервирован!!!", 4000);
                         }
-                        else if (__check_rfc__::check_rfc1122(net_address))
+                        else if (__check_rfc__::check_rfc1122(net_address, bits))
                         {
                             ui->statusbar->setStyleSheet(color_error);
-                            ui->statusbar->showMessage("Согласно RFC1122 0.0.0.0/8, 127.0.0.0/8, 240.0.0.0/4 зарезервированы!!!", 4000);
+                            ui->statusbar->showMessage("Согласно RFC1122 0.0.0.0/8, 127.0.0.0/8, 240.0.0.0/4, 255.255.255.255/32 зарезервированы!!!", 4000);
                         }
-                        else if (__check_rfc__::check_rfc2544(net_address))
+                        else if (__check_rfc__::check_rfc2544(net_address, bits))
                         {
                             ui->statusbar->setStyleSheet(color_error);
                             ui->statusbar->showMessage("Согласно RFC2544 198.18.0.0/15 зарезервирован!!!", 4000);
                         }
-                        else if (__check_rfc__::check_rfc3171(net_address))
+                        else if (__check_rfc__::check_rfc3171(net_address, bits))
                         {
                             ui->statusbar->setStyleSheet(color_error);
                             ui->statusbar->showMessage("Согласно RFC3171 224.0.0.0/4 зарезервирован!!!", 4000);

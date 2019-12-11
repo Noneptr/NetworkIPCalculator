@@ -181,12 +181,31 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
     QStandardItem *node = new QStandardItem(data);
 
     unsigned short bits = net_info.mask().countBits() + 1;
-    if (bits < 32)
+    if (bits < 31)
     {
-        NetMask subMask = NetMask(bits);
-        if ((subMask.countHosts() >= 2) && (net_info.busyHosts() == 0))                     // проверка на то что может ли существовать следующий узел
+        if (net_info.busyHosts() == 0)                     // проверка на то что может ли существовать следующий узел
         {
-            node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
+            //================================== Проверка RFC ============================================
+            if (!__check_rfc__::check_rfc5737(net_info.network(), net_info.mask().countBits()))
+            {
+                if (!__check_rfc__::check_rfc1122(net_info.network(), net_info.mask().countBits()))
+                {
+                    if (!__check_rfc__::check_rfc2544(net_info.network(), net_info.mask().countBits()))
+                    {
+                        if (!__check_rfc__::check_rfc3068(net_info.network(), net_info.mask().countBits()))
+                        {
+                            if (!__check_rfc__::check_rfc3171(net_info.network(), net_info.mask().countBits()))
+                            {
+                                if (!__check_rfc__::check_rfc3927(net_info.network(), net_info.mask().countBits()))
+                                {
+                                    node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //===========================================================================================
         }
     }
 
@@ -298,7 +317,25 @@ void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_host
             {
                 if (val <= 1)                   // случай когда кол-во необходимых для занятости хостов может разместиться в узле
                 {
-                    changeBusyHostInNode(node, node_info, busy_hosts);          // изменение состояния занятости подсети
+                    if (!__check_rfc__::check_rfc5737(node_info.network(), node_info.mask().countBits()))
+                    {
+                        if (!__check_rfc__::check_rfc1122(node_info.network(), node_info.mask().countBits()))
+                        {
+                            if (!__check_rfc__::check_rfc2544(node_info.network(), node_info.mask().countBits()))
+                            {
+                                if (!__check_rfc__::check_rfc3068(node_info.network(), node_info.mask().countBits()))
+                                {
+                                    if (!__check_rfc__::check_rfc3171(node_info.network(), node_info.mask().countBits()))
+                                    {
+                                        if (!__check_rfc__::check_rfc3927(node_info.network(), node_info.mask().countBits()))
+                                        {
+                                            changeBusyHostInNode(node, node_info, busy_hosts);          // изменение состояния занятости подсети
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else                            // случай когда кол-во свободных хостов сильно превышает кол-во необходимых для занятости хостов
                 {
@@ -324,21 +361,65 @@ void NetworkTreeModel::userMakeBusyNode(const QModelIndex &index, unsigned int b
     NetworkInfo net_info = stringToNetInfo(data);
     if (busy_hosts <= net_info.mask().countHosts())
     {
-        if (busy_hosts == 0)
+        //================================== Проверка RFC ============================================
+        if (!__check_rfc__::check_rfc5737(net_info.network(), net_info.mask().countBits()))
         {
-            net_info.setBusyHosts(busy_hosts);
-            netItem->setText(netInfoToString(net_info));
-            netItem->removeRows(0, netItem->rowCount());
-            netItem->appendRow(new QStandardItem(__emptySign__));
+            if (!__check_rfc__::check_rfc1122(net_info.network(), net_info.mask().countBits()))
+            {
+                if (!__check_rfc__::check_rfc2544(net_info.network(), net_info.mask().countBits()))
+                {
+                    if (!__check_rfc__::check_rfc3068(net_info.network(), net_info.mask().countBits()))
+                    {
+                        if (!__check_rfc__::check_rfc3171(net_info.network(), net_info.mask().countBits()))
+                        {
+                            if (!__check_rfc__::check_rfc3927(net_info.network(), net_info.mask().countBits()))
+                            {
+                                if (busy_hosts == 0)
+                                {
+                                    net_info.setBusyHosts(busy_hosts);
+                                    netItem->setText(netInfoToString(net_info));
+                                    netItem->removeRows(0, netItem->rowCount());
+                                    netItem->appendRow(new QStandardItem(__emptySign__));
 
-            //================== Отчистка иконки ===================================================
-            netItem->setIcon(QIcon());
-            //=======================================================================================
+                                    //================== Отчистка иконки ===================================================
+                                    netItem->setIcon(QIcon());
+                                    //=======================================================================================
+                                }
+                                else
+                                {
+                                    changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
+                                }
+                            }
+                            else
+                            {
+                                throw __check_rfc__::RFC_3927_ERROR;
+                            }
+                        }
+                        else
+                        {
+                            throw __check_rfc__::RFC_3171_ERROR;
+                        }
+                    }
+                    else
+                    {
+                        throw __check_rfc__::RFC_3068_ERROR;
+                    }
+                }
+                else
+                {
+                    throw __check_rfc__::RFC_2544_ERROR;
+                }
+            }
+            else
+            {
+                throw __check_rfc__::RFC_1122_ERROR;
+            }
         }
         else
         {
-            changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
+            throw __check_rfc__::RFC_5737_ERROR;
         }
+        //===========================================================================================
     }
     else
     {
