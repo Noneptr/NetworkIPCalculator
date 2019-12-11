@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QDebug>
 #include <QAbstractItemView>
 #include "networktreemodel.h"
 #include "networktreeview.h"
