@@ -186,24 +186,9 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
         if (net_info.busyHosts() == 0)                     // проверка на то что может ли существовать следующий узел
         {
             //================================== Проверка RFC ============================================
-            if (!__check_rfc__::check_rfc5737(net_info.network(), net_info.mask().countBits()))
+            if (!__check_rfc__::check_rfc(net_info.network()))
             {
-                if (!__check_rfc__::check_rfc1122(net_info.network(), net_info.mask().countBits()))
-                {
-                    if (!__check_rfc__::check_rfc2544(net_info.network(), net_info.mask().countBits()))
-                    {
-                        if (!__check_rfc__::check_rfc3068(net_info.network(), net_info.mask().countBits()))
-                        {
-                            if (!__check_rfc__::check_rfc3171(net_info.network(), net_info.mask().countBits()))
-                            {
-                                if (!__check_rfc__::check_rfc3927(net_info.network(), net_info.mask().countBits()))
-                                {
-                                    node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
-                                }
-                            }
-                        }
-                    }
-                }
+                node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
             }
             //===========================================================================================
         }
@@ -317,24 +302,9 @@ void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_host
             {
                 if (val <= 1)                   // случай когда кол-во необходимых для занятости хостов может разместиться в узле
                 {
-                    if (!__check_rfc__::check_rfc5737(node_info.network(), node_info.mask().countBits()))
+                    if (!__check_rfc__::check_rfc(node_info.network()))
                     {
-                        if (!__check_rfc__::check_rfc1122(node_info.network(), node_info.mask().countBits()))
-                        {
-                            if (!__check_rfc__::check_rfc2544(node_info.network(), node_info.mask().countBits()))
-                            {
-                                if (!__check_rfc__::check_rfc3068(node_info.network(), node_info.mask().countBits()))
-                                {
-                                    if (!__check_rfc__::check_rfc3171(node_info.network(), node_info.mask().countBits()))
-                                    {
-                                        if (!__check_rfc__::check_rfc3927(node_info.network(), node_info.mask().countBits()))
-                                        {
-                                            changeBusyHostInNode(node, node_info, busy_hosts);          // изменение состояния занятости подсети
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        changeBusyHostInNode(node, node_info, busy_hosts);          // изменение состояния занятости подсети
                     }
                 }
                 else                            // случай когда кол-во свободных хостов сильно превышает кол-во необходимых для занятости хостов
@@ -361,63 +331,24 @@ void NetworkTreeModel::userMakeBusyNode(const QModelIndex &index, unsigned int b
     NetworkInfo net_info = stringToNetInfo(data);
     if (busy_hosts <= net_info.mask().countHosts())
     {
-        //================================== Проверка RFC ============================================
-        if (!__check_rfc__::check_rfc5737(net_info.network(), net_info.mask().countBits()))
+        //================================== Проверка RFC ===========================================
+        if (!__check_rfc__::check_rfc_with_error(net_info.network()))
         {
-            if (!__check_rfc__::check_rfc1122(net_info.network(), net_info.mask().countBits()))
+            if (busy_hosts == 0)
             {
-                if (!__check_rfc__::check_rfc2544(net_info.network(), net_info.mask().countBits()))
-                {
-                    if (!__check_rfc__::check_rfc3068(net_info.network(), net_info.mask().countBits()))
-                    {
-                        if (!__check_rfc__::check_rfc3171(net_info.network(), net_info.mask().countBits()))
-                        {
-                            if (!__check_rfc__::check_rfc3927(net_info.network(), net_info.mask().countBits()))
-                            {
-                                if (busy_hosts == 0)
-                                {
-                                    net_info.setBusyHosts(busy_hosts);
-                                    netItem->setText(netInfoToString(net_info));
-                                    netItem->removeRows(0, netItem->rowCount());
-                                    netItem->appendRow(new QStandardItem(__emptySign__));
+                net_info.setBusyHosts(busy_hosts);
+                netItem->setText(netInfoToString(net_info));
+                netItem->removeRows(0, netItem->rowCount());
+                netItem->appendRow(new QStandardItem(__emptySign__));
 
-                                    //================== Отчистка иконки ===================================================
-                                    netItem->setIcon(QIcon());
-                                    //=======================================================================================
-                                }
-                                else
-                                {
-                                    changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
-                                }
-                            }
-                            else
-                            {
-                                throw __check_rfc__::RFC_3927_ERROR;
-                            }
-                        }
-                        else
-                        {
-                            throw __check_rfc__::RFC_3171_ERROR;
-                        }
-                    }
-                    else
-                    {
-                        throw __check_rfc__::RFC_3068_ERROR;
-                    }
-                }
-                else
-                {
-                    throw __check_rfc__::RFC_2544_ERROR;
-                }
+                //================== Отчистка иконки ===================================================
+                netItem->setIcon(QIcon());
+                //=======================================================================================
             }
             else
             {
-                throw __check_rfc__::RFC_1122_ERROR;
+                changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
             }
-        }
-        else
-        {
-            throw __check_rfc__::RFC_5737_ERROR;
         }
         //===========================================================================================
     }
