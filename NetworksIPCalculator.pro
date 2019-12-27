@@ -19,6 +19,7 @@ SOURCES += \
     iprecord.cpp \
     main.cpp \
     mainwindow.cpp \
+    netconfirmdialog.cpp \
     netinputdialog.cpp \
     netmask.cpp \
     networkinfo.cpp \
@@ -30,6 +31,7 @@ SOURCES += \
 HEADERS += \
     iprecord.h \
     mainwindow.h \
+    netconfirmdialog.h \
     netinputdialog.h \
     netmask.h \
     networkinfo.h \

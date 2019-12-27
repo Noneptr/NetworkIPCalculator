@@ -9,6 +9,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "rfcs_stds.h"
+#include "netconfirmdialog.h"
+#include <QDebug>
 
 
 QT_BEGIN_NAMESPACE
@@ -35,6 +37,8 @@ private slots:
     void displayStatusFileWriteActive();
 
     void displayStatusModelExpanded();
+
+    void confirmMergeNetwork(const QModelIndex &index);
 
     void on_action_create_triggered();
 

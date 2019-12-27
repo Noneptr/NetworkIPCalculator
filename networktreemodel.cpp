@@ -415,7 +415,7 @@ void NetworkTreeModel::writeNetworkInFile()
             QStandardItem *curr;
             while(!nodes.empty())                                                // обход дерева в ширину
             {
-//                emit fileWriteActive();
+                emit fileWriteActive();
 
                 curr = nodes.front();
                 nodes.pop();
@@ -454,7 +454,7 @@ void NetworkTreeModel::readNetworkOfFile()
         NetworkInfo net_info;
         while (fread(&net_info, sizeof(net_info), 1, file) == 1)        // чтение информации об узле из файла
         {
-//            emit fileReadActive();
+            emit fileReadActive();
             insertIntoNetwork(net_info);                                // вставка узла в дерево
         }
 
