@@ -10,31 +10,45 @@ MainWindow::MainWindow(QWidget *parent)
     model = new NetworkTreeModel(this);
 
     connect(ui->treeView, SIGNAL(expanded(const QModelIndex &)), model, SLOT(splitNetworkItem(const QModelIndex &)));
-    connect(ui->treeView, SIGNAL(collapsed(const QModelIndex &)), model, SLOT(mergeNetworkItem(const QModelIndex &)));
+    connect(ui->treeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(confirmMergeNetwork(const QModelIndex &)));
+
     connect(model, SIGNAL(needExpandItem(const QModelIndex &)), ui->treeView, SLOT(expand(const QModelIndex &)));
     connect(ui->treeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(setBusyNode(const QModelIndex &)));
-    connect(model, SIGNAL(searchIsActive()), this, SLOT(displayStatusSearch()));
     connect(model, SIGNAL(notMakedBusyNodes(const QVector<unsigned int> &)), this, SLOT(displayStatusMakedBusyNodes(const QVector<unsigned int> &)));
+    connect(model, &NetworkTreeModel::fileWrited, [&]{ui->statusbar->setStyleSheet(color_message);
+                                                      ui->statusbar->showMessage("Файл успешно сохранён...");});
+    connect(model, &NetworkTreeModel::fileReaded, [&]{ui->statusbar->setStyleSheet(color_message);
+                                                      ui->statusbar->showMessage("Файл успешно открыт...");});
+    connect(model, SIGNAL(searchIsActive()), this, SLOT(displayStatusSearch()));
     connect(model, SIGNAL(fileReadActive()), this, SLOT(displayStatusFileReadActive()));
     connect(model, SIGNAL(fileWriteActive()), this, SLOT(displayStatusFileWriteActive()));
     connect(model, SIGNAL(expandAllExistActive()), this, SLOT(displayStatusModelExpanded()));
-    connect(model, &NetworkTreeModel::fileWrited, [&]{ui->statusbar->setStyleSheet(color_message);
-                                                      ui->statusbar->showMessage("Файл успешно сохранён...", 3000);});
-    connect(model, &NetworkTreeModel::fileReaded, [&]{ui->statusbar->setStyleSheet(color_message);
-                                                      ui->statusbar->showMessage("Файл успешно открыт...", 3000);});
 
     ui->treeView->setModel(model);
     ui->treeView->setIndentation(75);
     ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);           // запрет на редактирование содержимого узлов дерева
-
-//    QVector<unsigned int> v = {60, 30, 8, 12, 18};
-//    model->makeBusyNodes(v);
 }
 
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+
+void MainWindow::confirmMergeNetwork(const QModelIndex &index)
+{
+    NetConfirmDialog dialog("Вы уверены что хотите агрегировать эту подсеть?", "Агрегировать", "Отмена", "Агрегация подсети", this);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        model->mergeNetworkItem(QModelIndex(index));
+    }
+    else
+    {
+        ui->treeView->expand(index);
+    }
 }
 
 
@@ -46,16 +60,52 @@ void MainWindow::setBusyNode(const QModelIndex &index)
     {
         try
         {
-            unsigned int count = dialog.resultInput().toUInt();
-            model->userMakeBusyNode(index, count);
-            ui->treeView->collapse(index);
+            try
+            {
+                unsigned int count = dialog.resultInput().toUInt();
+                model->userMakeBusyNode(index, count);
+                ui->treeView->collapse(index);
+            }
+            catch(__check_rfc__::RFC_ERROR &error)
+            {
+                if (error == __check_rfc__::RFC_5737_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC5737 192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24 зарезервированы!!!");
+                }
+                else if (error == __check_rfc__::RFC_1122_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC1122 0.0.0.0/8, 127.0.0.0/8, 240.0.0.0/4, 255.255.255.255/32 зарезервированы!!!");
+                }
+                else if (error == __check_rfc__::RFC_2544_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC2544 198.18.0.0/15 зарезервирован!!!");
+                }
+                else if (error == __check_rfc__::RFC_3068_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC3068 192.88.99.0/24 зарезервирован!!!");
+                }
+                else if (error == __check_rfc__::RFC_3171_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC3171 224.0.0.0/4 зарезервирован!!!");
+                }
+                else if (error == __check_rfc__::RFC_3927_ERROR)
+                {
+                    ui->statusbar->setStyleSheet(color_error);
+                    ui->statusbar->showMessage("Согласно RFC3927 169.254.0.0/16 зарезервирован!!!");
+                }
+            }
         }
         catch (NetworkTreeModelError &error)
         {
             if (error == __ERROR_USER_MAKE_BUSY_NODE__)
             {
                 ui->statusbar->setStyleSheet(color_error);
-                ui->statusbar->showMessage("Ошибка!!! Введено хостов больше, чем имеется в подсети!!!", 2500);
+                ui->statusbar->showMessage("Ошибка!!! Введено хостов больше, чем имеется в подсети!!!");
             }
         }
     }
@@ -77,28 +127,72 @@ void MainWindow::on_action_create_triggered()
                 unsigned short bits = list[1].toUShort();
                 try
                 {
-                    NetMask mask(bits);
-                    model->createNetworkRoot(adress, mask);
+                    if (bits > 0 && bits <= 30)
+                    {
+                        NetMask mask(bits);
+
+                        IPrecord net_address = adress & mask.mask();
+
+                        if (__check_rfc__::check_rfc5737(net_address))
+                        {
+                            ui->statusbar->setStyleSheet(color_error);
+                            ui->statusbar->showMessage("Согласно RFC5737 192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24 зарезервированы!!!");
+                        }
+                        else if (__check_rfc__::check_rfc3068(net_address))
+                        {
+                            ui->statusbar->setStyleSheet(color_error);
+                            ui->statusbar->showMessage("Согласно RFC3068 192.88.99.0/24 зарезервирован!!!");
+                        }
+                        else if (__check_rfc__::check_rfc3927(net_address))
+                        {
+                            ui->statusbar->setStyleSheet(color_error);
+                            ui->statusbar->showMessage("Согласно RFC3927 169.254.0.0/16 зарезервирован!!!");
+                        }
+                        else if (__check_rfc__::check_rfc1122(net_address))
+                        {
+                            ui->statusbar->setStyleSheet(color_error);
+                            ui->statusbar->showMessage("Согласно RFC1122 0.0.0.0/8, 127.0.0.0/8, 240.0.0.0/4, 255.255.255.255/32 зарезервированы!!!");
+                        }
+                        else if (__check_rfc__::check_rfc2544(net_address))
+                        {
+                            ui->statusbar->setStyleSheet(color_error);
+                            ui->statusbar->showMessage("Согласно RFC2544 198.18.0.0/15 зарезервирован!!!");
+                        }
+                        else if (__check_rfc__::check_rfc3171(net_address))
+                        {
+                            ui->statusbar->setStyleSheet(color_error);
+                            ui->statusbar->showMessage("Согласно RFC3171 224.0.0.0/4 зарезервирован!!!");
+                        }
+                        else
+                        {
+                            model->createNetworkRoot(adress, mask);
+                        }
+                    }
+                    else
+                    {
+                        ui->statusbar->setStyleSheet(color_error);
+                        ui->statusbar->showMessage("Некорректная маска корня дерева!!! Необходимо: 0 < mask < 31");
+                    }
                 }
                 catch(NetMaskError &err_mask)
                 {
                     if (err_mask == InvalidCountBitsError)
                     {
                         ui->statusbar->setStyleSheet(color_error);
-                        ui->statusbar->showMessage("Ошибка!!! Некорректный маска подсети!!!", 2500);
+                        ui->statusbar->showMessage("Некорректная маска подсети!!!");
                     }
                 }
             }
             catch(IPrecordError &err_adress)
             {
                 ui->statusbar->setStyleSheet(color_error);
-                ui->statusbar->showMessage("Ошибка!!! Некорректный IP адрес!!!", 2500);
+                ui->statusbar->showMessage("Некорректный IP адрес!!!");
             }
         }
         else
         {
             ui->statusbar->setStyleSheet(color_error);
-            ui->statusbar->showMessage("Ошибка!!! Неверно указан префикс маски!!!", 2500);
+            ui->statusbar->showMessage("Неверно указан префикс маски!!!");
         }
     }
 }
@@ -121,11 +215,13 @@ void MainWindow::on_action_search_triggered()
                 {
                     ui->treeView->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
                 }
+                ui->statusbar->setStyleSheet(color_message);
+                ui->statusbar->showMessage("Поиск завершён...");
             }
             else
             {
                 ui->statusbar->setStyleSheet(color_message);
-                ui->statusbar->showMessage("Элемент не найден!!!", 2500);
+                ui->statusbar->showMessage("Элемент не найден!!!");
             }
         }
         catch (NetworkTreeModelError &error)
@@ -133,7 +229,7 @@ void MainWindow::on_action_search_triggered()
             if (error == __ERROR_NETWORK_TREE_IS_EMPTY__)
             {
                 ui->statusbar->setStyleSheet(color_error);
-                ui->statusbar->showMessage("Ошибка!!! Сетевое дерево не создано!!!", 2500);
+                ui->statusbar->showMessage("Сетевое дерево не создано!!!");
             }
         }
     }
@@ -160,27 +256,27 @@ void MainWindow::displayStatusMakedBusyNodes(const QVector<unsigned int> &vals)
     }
     text += " )";
     ui->statusbar->setStyleSheet(color_error);
-    ui->statusbar->showMessage(text, 3000);
+    ui->statusbar->showMessage(text);
 }
 
 
 void MainWindow::displayStatusFileReadActive()
 {
     ui->statusbar->setStyleSheet(color_message);
-    ui->statusbar->showMessage("Открытие...", 1000);
+    ui->statusbar->showMessage("Открытие...");
 }
 
 void MainWindow::displayStatusFileWriteActive()
 {
     ui->statusbar->setStyleSheet(color_message);
-    ui->statusbar->showMessage("Сохранение...", 1000);
+    ui->statusbar->showMessage("Сохранение...");
 }
 
 
 void MainWindow::displayStatusModelExpanded()
 {
     ui->statusbar->setStyleSheet(color_message);
-    ui->statusbar->showMessage("Идёт обработка...", 1000);
+    ui->statusbar->showMessage("Идёт обработка...");
 }
 
 
@@ -218,7 +314,7 @@ void MainWindow::on_action_split_triggered()
                 if (ui->statusbar->currentMessage() == "")
                 {
                     ui->statusbar->setStyleSheet(color_message);
-                    ui->statusbar->showMessage("Сеть успешно разбита", 2500);
+                    ui->statusbar->showMessage("Сеть успешно разбита");
                 }
             }
             catch(NetworkTreeModelError &error)
@@ -226,14 +322,14 @@ void MainWindow::on_action_split_triggered()
                 if (error == __ERROR_NETWORK_TREE_IS_EMPTY__)
                 {
                     ui->statusbar->setStyleSheet(color_error);
-                    ui->statusbar->showMessage("Ошибка!!! Сетевое дерево не создано!!!", 2500);
+                    ui->statusbar->showMessage("Сетевое дерево не создано!!!");
                 }
             }
         }
         else
         {
             ui->statusbar->setStyleSheet(color_error);
-            ui->statusbar->showMessage("Некорректное значение размера подсети!!!", 2500);
+            ui->statusbar->showMessage("Некорректное значение размера подсети!!!");
         }
     }
 }
@@ -260,7 +356,7 @@ void MainWindow::on_action_open_triggered()
             if (error == __ERROR_READ_OF_BIN_FILE__)
             {
                 ui->statusbar->setStyleSheet(color_error);
-                ui->statusbar->showMessage("Ошибка открытия файла!!!", 2500);
+                ui->statusbar->showMessage("Ошибка открытия файла!!!");
             }
         }
     }
@@ -292,7 +388,7 @@ void MainWindow::on_action_save_triggered()
             if (error == __ERROR_WRITE_IN_BIN_FILE__)
             {
                 ui->statusbar->setStyleSheet(color_error);
-                ui->statusbar->showMessage("Ошибка сохранения файла!!!", 2500);
+                ui->statusbar->showMessage("Ошибка сохранения файла!!!");
             }
         }
     }

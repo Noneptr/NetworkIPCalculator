@@ -3,7 +3,7 @@
 
 
 #include <QTreeView>
-#include <QDebug>
+#include "netconfirmdialog.h"
 
 class NetworkTreeView: public QTreeView
 {

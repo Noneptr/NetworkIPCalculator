@@ -2,7 +2,6 @@
 #define NETMASK_H
 
 #include "iprecord.h"
-#include <cmath>
 #include <QVector>
 
 const QVector<unsigned short> allow_octets = {0, 128, 192, 224, 240, 248, 252, 254, 255};           // вектор возможных значений для октетов маски

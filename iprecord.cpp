@@ -235,6 +235,15 @@ bool IPrecord::operator == (const IPrecord &obj) const
 }
 
 
+bool IPrecord::operator != (const IPrecord &obj) const
+{
+    return  __one_oct != obj.__one_oct ||
+            __two_oct != obj.__two_oct ||
+            __three_oct != obj.__three_oct ||
+            __four_oct != obj.__four_oct;
+}
+
+
 bool IPrecord::operator < (const IPrecord &obj) const
 {
     return this->toUInt() < obj.toUInt();

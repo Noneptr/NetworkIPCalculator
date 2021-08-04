@@ -53,6 +53,7 @@ public:
     bool operator > (const IPrecord &obj) const;
     bool operator <= (const IPrecord &obj) const;
     bool operator >= (const IPrecord &obj) const;
+    bool operator != (const IPrecord &obj) const;
 
     static unsigned int IPrecordToUInt(const IPrecord &rec);
     static IPrecord uintToIPrecord(unsigned int val);

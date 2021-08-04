@@ -19,21 +19,25 @@ SOURCES += \
     iprecord.cpp \
     main.cpp \
     mainwindow.cpp \
+    netconfirmdialog.cpp \
     netinputdialog.cpp \
     netmask.cpp \
     networkinfo.cpp \
     networktreemodel.cpp \
     networktreeview.cpp \
+    rfcs_stds.cpp \
     sort_qvector_helper.cpp
 
 HEADERS += \
     iprecord.h \
     mainwindow.h \
+    netconfirmdialog.h \
     netinputdialog.h \
     netmask.h \
     networkinfo.h \
     networktreemodel.h \
     networktreeview.h \
+    rfcs_stds.h \
     sort_qvector_helper.h
 
 FORMS += \

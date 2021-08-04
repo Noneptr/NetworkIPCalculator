@@ -4,9 +4,8 @@
 #include <QStandardItemModel>
 #include "networkinfo.h"
 #include <queue>
-#include <cmath>
-#include <QDebug>
 #include "sort_qvector_helper.h"
+#include "rfcs_stds.h"
 
 /* Класс представляет
  * собой древовидную структуру данных
@@ -15,10 +14,9 @@
  *          /     \
     subnet1        subnet2 */
 
-
 enum NetworkTreeModelError {__ERROR_WRITE_IN_BIN_FILE__, __ERROR_READ_OF_BIN_FILE__,
                            __ERROR_USER_MAKE_BUSY_NODE__,
-                           __ERROR_NETWORK_TREE_IS_EMPTY__,};                                  // Исключения вызываемые классом
+                           __ERROR_NETWORK_TREE_IS_EMPTY__};                                  // Исключения вызываемые классом
 
 const QString __file_extention__ = ".ipcalc";                                               // расширение бинарного файла с сетевой схемой
 

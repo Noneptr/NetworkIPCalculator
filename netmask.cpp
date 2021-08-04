@@ -52,25 +52,25 @@ void NetMask::setMask(unsigned short count_bits)
 
         if (count_bits <= 8)
         {
-            __mask.setOneOctet(allow_octets[count_bits]);
+            __mask.setOneOctet(allow_octets.at(count_bits));
         }
         else if (count_bits <= 16)
         {
             __mask.setOneOctet(255);
-            __mask.setTwoOctet(allow_octets[count_bits - 8]);
+            __mask.setTwoOctet(allow_octets.at(count_bits - 8));
         }
         else if (count_bits <= 24)
         {
             __mask.setOneOctet(255);
             __mask.setTwoOctet(255);
-            __mask.setThreeOctet(allow_octets[count_bits - 16]);
+            __mask.setThreeOctet(allow_octets.at(count_bits - 16));
         }
         else
         {
             __mask.setOneOctet(255);
             __mask.setTwoOctet(255);
             __mask.setThreeOctet(255);
-            __mask.setFourOctet(allow_octets[count_bits - 24]);
+            __mask.setFourOctet(allow_octets.at(count_bits - 24));
         }
     }
     else

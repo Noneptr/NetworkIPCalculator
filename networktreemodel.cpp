@@ -180,10 +180,18 @@ void NetworkTreeModel::createNetworkItem(QStandardItem *parent, const NetworkInf
 
     QStandardItem *node = new QStandardItem(data);
 
-    NetMask subMask = NetMask(net_info.mask().countBits() + 1);
-    if ((subMask.countHosts() >= 2) && (net_info.busyHosts() == 0))                     // проверка на то что может ли существовать следующий узел
+    unsigned short bits = net_info.mask().countBits() + 1;
+    if (bits < 31)
     {
-        node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
+        if (net_info.busyHosts() == 0)                     // проверка на то что может ли существовать следующий узел
+        {
+            //================================== Проверка RFC ============================================
+            if (!__check_rfc__::check_rfc(net_info.network()))
+            {
+                node->appendRow(new QStandardItem(__emptySign__));                              // добавление пустого символа
+            }
+            //===========================================================================================
+        }
     }
 
     parent->appendRow(node);
@@ -294,7 +302,10 @@ void NetworkTreeModel::makeBusyNode(QStandardItem *node, unsigned int &busy_host
             {
                 if (val <= 1)                   // случай когда кол-во необходимых для занятости хостов может разместиться в узле
                 {
-                    changeBusyHostInNode(node, node_info, busy_hosts);          // изменение состояния занятости подсети
+                    if (!__check_rfc__::check_rfc(node_info.network()))
+                    {
+                        changeBusyHostInNode(node, node_info, busy_hosts);          // изменение состояния занятости подсети
+                    }
                 }
                 else                            // случай когда кол-во свободных хостов сильно превышает кол-во необходимых для занятости хостов
                 {
@@ -320,21 +331,26 @@ void NetworkTreeModel::userMakeBusyNode(const QModelIndex &index, unsigned int b
     NetworkInfo net_info = stringToNetInfo(data);
     if (busy_hosts <= net_info.mask().countHosts())
     {
-        if (busy_hosts == 0)
+        //================================== Проверка RFC ===========================================
+        if (!__check_rfc__::check_rfc_with_error(net_info.network()))
         {
-            net_info.setBusyHosts(busy_hosts);
-            netItem->setText(netInfoToString(net_info));
-            netItem->removeRows(0, netItem->rowCount());
-            netItem->appendRow(new QStandardItem(__emptySign__));
+            if (busy_hosts == 0)
+            {
+                net_info.setBusyHosts(busy_hosts);
+                netItem->setText(netInfoToString(net_info));
+                netItem->removeRows(0, netItem->rowCount());
+                netItem->appendRow(new QStandardItem(__emptySign__));
 
-            //================== Отчистка иконки ===================================================
-            netItem->setIcon(QIcon());
-            //=======================================================================================
+                //================== Отчистка иконки ===================================================
+                netItem->setIcon(QIcon());
+                //=======================================================================================
+            }
+            else
+            {
+                changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
+            }
         }
-        else
-        {
-            changeBusyHostInNode(netItem, net_info, busy_hosts);                    // изменение состояния занятости подсети
-        }
+        //===========================================================================================
     }
     else
     {
@@ -399,7 +415,7 @@ void NetworkTreeModel::writeNetworkInFile()
             QStandardItem *curr;
             while(!nodes.empty())                                                // обход дерева в ширину
             {
-//                emit fileWriteActive();
+                emit fileWriteActive();
 
                 curr = nodes.front();
                 nodes.pop();
@@ -438,7 +454,7 @@ void NetworkTreeModel::readNetworkOfFile()
         NetworkInfo net_info;
         while (fread(&net_info, sizeof(net_info), 1, file) == 1)        // чтение информации об узле из файла
         {
-//            emit fileReadActive();
+            emit fileReadActive();
             insertIntoNetwork(net_info);                                // вставка узла в дерево
         }
 
@@ -473,7 +489,7 @@ QVector<QModelIndex> NetworkTreeModel::findNodes(const QString &key)
             QString data = curr->text();
             if (data != __emptySign__)
             {
-                if (data.indexOf(key) != -1)
+                if (data.toLower().indexOf(key.toLower()) != -1)
                 {
                     find_nodes.append(curr->index());
                 }
